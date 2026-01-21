@@ -4,7 +4,7 @@
   "private": true,
   "description": "Serverless backend for euGestante using Firebase",
   "engines": {
-    "node": "18.x"
+    "node": "24.x"
   },
   "dependencies": {
     "firebase-admin": "^12.5.0"
