@@ -1,0 +1,12 @@
+﻿{
+  "name": "eugestante-backend",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Serverless backend for euGestante using Firebase",
+  "engines": {
+    "node": "18.x"
+  },
+  "dependencies": {
+    "firebase-admin": "^12.5.0"
+  }
+}
