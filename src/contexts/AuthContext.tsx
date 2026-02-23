@@ -85,20 +85,34 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       try {
         logger.debug('Iniciando processamento de redirect...');
         
-        // Aguardar um pouco antes de processar o redirect no Safari iOS
-        // Isso garante que a página tenha carregado completamente
-        await new Promise(resolve => setTimeout(resolve, 200));
-        logger.debug('Aguardou 200ms, chamando getRedirectResult...');
+        // No Safari iOS, o redirect pode demorar mais para ser processado
+        // Tentar múltiplas vezes com intervalos maiores
+        const isSafariIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) && !/Chrome|CriOS|FxiOS/.test(navigator.userAgent);
+        const maxAttempts = isSafariIOS ? 5 : 1;
+        const delay = isSafariIOS ? 1000 : 200;
         
-        const result = await authService.getRedirectResult();
-        logger.debug('getRedirectResult retornou:', result ? 'resultado encontrado' : 'null', result?.user?.email || 'sem email');
+        let result = null;
+        
+        for (let attempt = 1; attempt <= maxAttempts; attempt++) {
+          logger.debug(`Tentativa ${attempt}/${maxAttempts} - Aguardando ${delay}ms...`);
+          await new Promise(resolve => setTimeout(resolve, delay));
+          
+          logger.debug(`Tentativa ${attempt}: Chamando getRedirectResult...`);
+          result = await authService.getRedirectResult();
+          
+          if (result?.user) {
+            logger.debug(`Tentativa ${attempt}: Usuário encontrado!`, result.user.email);
+            break;
+          } else {
+            logger.debug(`Tentativa ${attempt}: Nenhum resultado ainda...`);
+          }
+        }
         
         if (result?.user) {
           logger.debug('Usuário encontrado no redirect:', result.user.email);
-          // Se houver resultado, aguardar mais tempo para garantir que o Firebase processe completamente
-          // Isso é especialmente importante no Safari iOS
-          await new Promise(resolve => setTimeout(resolve, 1000));
-          logger.debug('Aguardou 1000ms, definindo usuário...');
+          // Aguardar um pouco mais para garantir que o Firebase processe completamente
+          await new Promise(resolve => setTimeout(resolve, 500));
+          logger.debug('Aguardou 500ms, definindo usuário...');
           
           // O onAuthStateChanged vai atualizar o estado automaticamente
           // Mas também vamos garantir que o usuário seja definido aqui
@@ -108,7 +122,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           await loadProfile(result.user);
           logger.debug('Perfil carregado');
         } else {
-          logger.debug('Nenhum resultado de redirect encontrado');
+          logger.debug('Nenhum resultado de redirect encontrado após todas as tentativas');
         }
         setLoading(false);
         logger.debug('Loading definido como false');
