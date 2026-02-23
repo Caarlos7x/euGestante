@@ -15,6 +15,7 @@ import {
   EmailAuthProvider,
 } from 'firebase/auth';
 import { auth, isFirebaseConfigured } from '@/firebase/config';
+import { logger } from '@/utils/logger';
 
 export interface AuthError {
   code: string;
@@ -90,32 +91,32 @@ export const authService = {
     const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
     const isAndroid = /android/i.test(userAgent);
 
-    console.log('=== DEBUG LOGIN GOOGLE ===');
-    console.log('User agent:', navigator.userAgent);
-    console.log('iOS:', isIOS);
-    console.log('Safari:', isSafari);
-    console.log('Safari iOS:', isSafariIOS);
-    console.log('Mobile:', isMobile);
-    console.log('Android:', isAndroid);
-    console.log('==========================');
+    logger.debug('=== DEBUG LOGIN GOOGLE ===');
+    logger.debug('User agent:', navigator.userAgent);
+    logger.debug('iOS:', isIOS);
+    logger.debug('Safari:', isSafari);
+    logger.debug('Safari iOS:', isSafariIOS);
+    logger.debug('Mobile:', isMobile);
+    logger.debug('Android:', isAndroid);
+    logger.debug('==========================');
 
     try {
       // Safari iOS: usar redirect diretamente (mais confiável)
       if (isSafariIOS) {
-        console.log('Safari iOS detectado: usando redirect diretamente...');
+        logger.debug('Safari iOS detectado: usando redirect diretamente...');
         await signInWithRedirect(auth!, provider);
         throw new Error('Redirect iniciado');
       }
 
       // Android: tentar popup primeiro, fallback para redirect
       if (isAndroid || isMobile) {
-        console.log('Mobile detectado: tentando popup primeiro...');
+        logger.debug('Mobile detectado: tentando popup primeiro...');
         try {
           const result = await signInWithPopup(auth!, provider);
-          console.log('Popup bem-sucedido:', result.user?.email);
+          logger.debug('Popup bem-sucedido:', result.user?.email);
           return result;
         } catch (popupError: any) {
-          console.log('Popup falhou, usando redirect...', popupError?.code);
+          logger.debug('Popup falhou, usando redirect...', popupError?.code);
           
           // Se popup foi bloqueado ou não suportado, usar redirect
           if (
@@ -125,7 +126,7 @@ export const authService = {
             popupError?.code === 'auth/cancelled-popup-request' ||
             popupError?.code === 'auth/popup-closed-by-user'
           ) {
-            console.log('Usando redirect como fallback...');
+            logger.debug('Usando redirect como fallback...');
             await signInWithRedirect(auth!, provider);
             throw new Error('Redirect iniciado');
           }
@@ -134,13 +135,13 @@ export const authService = {
       }
 
       // Desktop: tentar popup primeiro, fallback para redirect
-      console.log('Desktop: tentando popup...');
+      logger.debug('Desktop: tentando popup...');
       try {
         const result = await signInWithPopup(auth!, provider);
-        console.log('Popup bem-sucedido:', result.user?.email);
+        logger.debug('Popup bem-sucedido:', result.user?.email);
         return result;
       } catch (popupError: any) {
-        console.log('Popup falhou, tentando redirect...', popupError?.code);
+        logger.debug('Popup falhou, tentando redirect...', popupError?.code);
         
         // Se popup foi bloqueado ou não suportado, usar redirect
         if (
@@ -149,7 +150,7 @@ export const authService = {
           popupError?.code === 'auth/operation-not-allowed' ||
           popupError?.code === 'auth/cancelled-popup-request'
         ) {
-          console.log('Usando redirect como fallback...');
+          logger.debug('Usando redirect como fallback...');
           await signInWithRedirect(auth!, provider);
           throw new Error('Redirect iniciado');
         }
@@ -179,7 +180,7 @@ export const authService = {
       ) {
         return null;
       }
-      console.error('Erro no redirect do Google:', error);
+      logger.error('Erro no redirect do Google:', error);
       throw new Error(getAuthErrorMessage(error));
     }
   },

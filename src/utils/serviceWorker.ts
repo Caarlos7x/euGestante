@@ -1,4 +1,5 @@
 // Utilitário para registrar e gerenciar Service Worker
+import { logger } from './logger';
 
 /**
  * Registra o Service Worker
@@ -10,24 +11,24 @@ export async function registerServiceWorker(): Promise<ServiceWorkerRegistration
         scope: '/',
       });
       
-      console.log('Service Worker registrado com sucesso:', registration.scope);
+      logger.debug('Service Worker registrado com sucesso:', registration.scope);
       
       // Aguardar o Service Worker estar ativo
       if (registration.installing) {
-        console.log('Service Worker instalando...');
+        logger.debug('Service Worker instalando...');
       } else if (registration.waiting) {
-        console.log('Service Worker aguardando...');
+        logger.debug('Service Worker aguardando...');
       } else if (registration.active) {
-        console.log('Service Worker ativo');
+        logger.debug('Service Worker ativo');
       }
       
       return registration;
     } catch (error) {
-      console.error('Erro ao registrar Service Worker:', error);
+      logger.error('Erro ao registrar Service Worker:', error);
       return null;
     }
   } else {
-    console.warn('Service Workers não são suportados neste navegador');
+    logger.warn('Service Workers não são suportados neste navegador');
     return null;
   }
 }
@@ -52,7 +53,7 @@ export async function scheduleNotificationInSW(
       });
       return true;
     } catch (error) {
-      console.error('Erro ao enviar mensagem para Service Worker:', error);
+      logger.error('Erro ao enviar mensagem para Service Worker:', error);
       return false;
     }
   }
@@ -71,7 +72,7 @@ export async function cancelNotificationInSW(tag: string): Promise<boolean> {
       });
       return true;
     } catch (error) {
-      console.error('Erro ao cancelar notificação no Service Worker:', error);
+      logger.error('Erro ao cancelar notificação no Service Worker:', error);
       return false;
     }
   }

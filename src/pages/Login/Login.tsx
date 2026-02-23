@@ -256,21 +256,15 @@ export const Login: React.FC = () => {
     setIsLoading(true);
 
     try {
-      console.log('=== DEBUG LOGIN GOOGLE ===');
-      console.log('Iniciando login com Google...');
+      // Login com Google iniciado
       
       await signInWithGoogle();
-      console.log('Login Google iniciado com sucesso');
       // O redirecionamento será feito pelo useEffect quando o user mudar
     } catch (error: any) {
-      console.error('=== ERRO NO LOGIN GOOGLE ===');
-      console.error('Erro:', error);
-      console.error('Mensagem:', error?.message);
-      console.error('===========================');
+      // Erro no login Google (já tratado pelo getAuthErrorMessage)
       
       // Ignorar erro de redirect iniciado (a página será redirecionada)
       if (error.message === 'Redirect iniciado') {
-        console.log('Redirect iniciado, aguardando redirecionamento...');
         return;
       }
       

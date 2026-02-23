@@ -78,15 +78,12 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return;
     }
 
-    console.log('Verificando resultado de redirect do Google...');
+    // Verificar resultado de redirect do Google (silencioso em produção)
     authService
       .getRedirectResult()
       .then((result) => {
         if (result) {
-          console.log('Login Google bem-sucedido via redirect:', result.user?.email);
           // O onAuthStateChanged vai atualizar o estado automaticamente
-        } else {
-          console.log('Nenhum resultado de redirect encontrado');
         }
         setLoading(false);
       })
