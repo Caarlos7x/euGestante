@@ -36,14 +36,15 @@ const LogoContainer = styled.div`
 `;
 
 const LogoImage = styled.img`
-  width: 10rem; /* 72px baseado em 12px */
-  height: 10rem; /* 72px baseado em 12px */
+  width: 10rem; /* 120px baseado em 12px */
+  height: 10rem; /* 120px baseado em 12px */
   object-fit: contain;
   filter: brightness(0) saturate(100%) invert(27%) sepia(89%) saturate(1234%) hue-rotate(258deg) brightness(95%) contrast(89%);
 
   @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    width: 5rem; /* 60px em mobile */
-    height: 5rem; /* 60px em mobile */
+    width: 12rem; /* 144px em mobile - aumentado */
+    height: 12rem; /* 144px em mobile - aumentado */
+    filter: brightness(0) saturate(100%) invert(27%) sepia(89%) saturate(1234%) hue-rotate(258deg) brightness(95%) contrast(89%);
   }
 `;
 
