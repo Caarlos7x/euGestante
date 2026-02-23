@@ -93,6 +93,14 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
         
         let result = null;
         
+        // Verificar se há indicação de redirect na URL antes de começar
+        const hasRedirectParams = window.location.search.includes('code=') || 
+                                   window.location.search.includes('state=') ||
+                                   window.location.hash.includes('code=') ||
+                                   window.location.hash.includes('state=');
+        logger.debug('Verificando URL para parâmetros de redirect:', hasRedirectParams);
+        logger.debug('URL completa:', window.location.href);
+        
         for (let attempt = 1; attempt <= maxAttempts; attempt++) {
           logger.debug(`Tentativa ${attempt}/${maxAttempts} - Aguardando ${delay}ms...`);
           await new Promise(resolve => setTimeout(resolve, delay));
@@ -105,6 +113,11 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
             break;
           } else {
             logger.debug(`Tentativa ${attempt}: Nenhum resultado ainda...`);
+            // Se não há parâmetros de redirect na URL, não adianta continuar tentando
+            if (attempt === 1 && !hasRedirectParams) {
+              logger.debug('Nenhum parâmetro de redirect encontrado na URL. Pode não ter havido redirect.');
+              break;
+            }
           }
         }
         

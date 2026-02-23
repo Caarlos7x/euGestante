@@ -172,12 +172,36 @@ export const authService = {
       return null;
     }
     try {
+      // Log da URL atual para debug
+      logger.debug('getRedirectResult: URL atual:', window.location.href);
+      logger.debug('getRedirectResult: Parâmetros da URL:', window.location.search);
+      logger.debug('getRedirectResult: Hash da URL:', window.location.hash);
+      
       logger.debug('getRedirectResult: Chamando Firebase getRedirectResult...');
       const result = await getRedirectResult(auth);
       logger.debug('getRedirectResult: Resultado recebido:', result ? `usuário: ${result.user?.email}` : 'null');
+      
+      if (!result) {
+        // Verificar se há parâmetros na URL que indiquem um redirect
+        const urlParams = new URLSearchParams(window.location.search);
+        const hashParams = new URLSearchParams(window.location.hash.substring(1));
+        logger.debug('getRedirectResult: URL params:', Array.from(urlParams.entries()));
+        logger.debug('getRedirectResult: Hash params:', Array.from(hashParams.entries()));
+        
+        // Verificar localStorage/sessionStorage para debug
+        try {
+          const authState = localStorage.getItem('firebase:authUser');
+          logger.debug('getRedirectResult: localStorage authUser:', authState ? 'existe' : 'não existe');
+        } catch (e) {
+          logger.debug('getRedirectResult: Erro ao acessar localStorage:', e);
+        }
+      }
+      
       return result;
     } catch (error: any) {
       logger.error('getRedirectResult: Erro:', error?.code || error?.message || error);
+      logger.error('getRedirectResult: Stack:', error?.stack);
+      
       // Ignorar erros de cancelamento
       if (
         error?.code === 'auth/popup-closed-by-user' ||
