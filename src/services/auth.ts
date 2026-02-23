@@ -177,6 +177,27 @@ export const authService = {
       logger.debug('getRedirectResult: Parâmetros da URL:', window.location.search);
       logger.debug('getRedirectResult: Hash da URL:', window.location.hash);
       
+      // No Safari iOS, verificar se há cookies/localStorage disponível
+      const isSafariIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) && 
+                         /Safari/.test(navigator.userAgent) && 
+                         !/Chrome|CriOS|FxiOS/.test(navigator.userAgent);
+      if (isSafariIOS) {
+        try {
+          const testKey = '__safari_test__';
+          localStorage.setItem(testKey, 'test');
+          const canUseStorage = localStorage.getItem(testKey) === 'test';
+          localStorage.removeItem(testKey);
+          logger.debug('getRedirectResult: localStorage acessível:', canUseStorage);
+          
+          // Verificar cookies
+          document.cookie = 'test=1; path=/';
+          const canUseCookies = document.cookie.includes('test=1');
+          logger.debug('getRedirectResult: Cookies acessíveis:', canUseCookies);
+        } catch (e) {
+          logger.error('getRedirectResult: Erro ao verificar storage:', e);
+        }
+      }
+      
       logger.debug('getRedirectResult: Chamando Firebase getRedirectResult...');
       const result = await getRedirectResult(auth);
       logger.debug('getRedirectResult: Resultado recebido:', result ? `usuário: ${result.user?.email}` : 'null');

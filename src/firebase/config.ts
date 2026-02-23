@@ -68,9 +68,22 @@ if (hasAllRequiredVars) {
     db = getFirestore(app);
 
     // Configurar persistência para melhor suporte em mobile
+    // No Safari iOS, usar browserLocalPersistence pode ajudar com redirects
     setPersistence(auth, browserLocalPersistence).catch((error) => {
       console.error('Erro ao configurar persistência do Firebase:', error);
     });
+    
+    // Log para debug no Safari iOS
+    if (typeof window !== 'undefined') {
+      const isSafariIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) && 
+                         /Safari/.test(navigator.userAgent) && 
+                         !/Chrome|CriOS|FxiOS/.test(navigator.userAgent);
+      if (isSafariIOS && import.meta.env.DEV) {
+        console.log('Firebase configurado para Safari iOS');
+        console.log('Auth Domain:', firebaseConfig.authDomain);
+        console.log('Project ID:', firebaseConfig.projectId);
+      }
+    }
   } catch (error) {
     console.error('Erro ao inicializar Firebase:', error);
     // Não lançar erro em desenvolvimento para permitir desenvolvimento sem Firebase
