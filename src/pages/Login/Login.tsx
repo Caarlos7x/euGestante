@@ -253,14 +253,20 @@ export const Login: React.FC = () => {
 
   // Redirecionar se já estiver autenticado
   useEffect(() => {
+    logger.debug('Login useEffect - user:', user?.email || 'null', 'authLoading:', authLoading);
+    
     // No Safari iOS, após redirect do Google, pode levar um tempo para processar
     // Aguardar que o loading termine e o usuário esteja definido
     if (!authLoading && user) {
+      logger.debug('Usuário autenticado detectado, redirecionando em 200ms...');
       // Pequeno delay para garantir que tudo esteja processado corretamente
       const timer = setTimeout(() => {
+        logger.debug('Redirecionando para /home');
         navigate('/home', { replace: true });
       }, 200);
       return () => clearTimeout(timer);
+    } else {
+      logger.debug('Aguardando autenticação - user:', user?.email || 'null', 'loading:', authLoading);
     }
   }, [user, authLoading, navigate]);
 
