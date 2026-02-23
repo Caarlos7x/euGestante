@@ -191,8 +191,14 @@ export const Login: React.FC = () => {
 
   // Redirecionar se já estiver autenticado
   useEffect(() => {
+    // No Safari iOS, após redirect do Google, pode levar um tempo para processar
+    // Aguardar que o loading termine e o usuário esteja definido
     if (!authLoading && user) {
-      navigate('/home', { replace: true });
+      // Pequeno delay para garantir que tudo esteja processado corretamente
+      const timer = setTimeout(() => {
+        navigate('/home', { replace: true });
+      }, 200);
+      return () => clearTimeout(timer);
     }
   }, [user, authLoading, navigate]);
 

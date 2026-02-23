@@ -78,16 +78,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return;
     }
 
-    // Verificar resultado de redirect do Google (silencioso em produção)
-    authService
-      .getRedirectResult()
-      .then((result) => {
-        if (result) {
+    // Verificar resultado de redirect do Google
+    // No Safari iOS, pode levar um tempo para processar o redirect
+    const processRedirect = async () => {
+      try {
+        const result = await authService.getRedirectResult();
+        if (result?.user) {
+          // Se houver resultado, aguardar um pouco para garantir que o Firebase processe
+          // Isso é especialmente importante no Safari iOS
+          await new Promise(resolve => setTimeout(resolve, 500));
           // O onAuthStateChanged vai atualizar o estado automaticamente
         }
         setLoading(false);
-      })
-      .catch((error) => {
+      } catch (error: any) {
         // Ignorar erros quando Firebase não está configurado
         if (error.message?.includes('Firebase não está configurado')) {
           setLoading(false);
@@ -98,13 +101,16 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           error?.code === 'auth/popup-closed-by-user' ||
           error?.code === 'auth/cancelled-popup-request'
         ) {
-          console.log('Login cancelado pelo usuário');
           setLoading(false);
           return;
         }
-        console.error('Erro ao processar redirect:', error);
+        // Para outros erros, ainda definir loading como false
+        // O onAuthStateChanged pode ter atualizado o estado
         setLoading(false);
-      });
+      }
+    };
+
+    processRedirect();
   }, []);
 
   // Observar mudanças no estado de autenticação
@@ -117,8 +123,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
       return;
     }
 
+    let isInitialLoad = true;
+
     const unsubscribe = authService.onAuthStateChanged(async (currentUser) => {
       setUser(currentUser);
+
+      // No primeiro carregamento, aguardar o processamento do redirect
+      if (isInitialLoad) {
+        isInitialLoad = false;
+        // Aguardar um pouco para garantir que o redirect seja processado
+        // Isso é especialmente importante no Safari iOS
+        await new Promise(resolve => setTimeout(resolve, 300));
+      }
+
       setLoading(false);
 
       if (currentUser) {
