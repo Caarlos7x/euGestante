@@ -51,25 +51,6 @@ const NotesGrid = styled.div`
   }
 `;
 
-const EmptyState = styled.div`
-  text-align: center;
-  padding: ${({ theme }) => theme.spacing['3xl']};
-  color: ${({ theme }) => theme.colors.text.secondary};
-`;
-
-const EmptyStateTitle = styled.h3`
-  font-size: ${({ theme }) => theme.typography.fontSize.xl};
-  font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
-  color: ${({ theme }) => theme.colors.text.primary};
-  margin-bottom: ${({ theme }) => theme.spacing.md};
-`;
-
-const EmptyStateText = styled.p`
-  font-size: ${({ theme }) => theme.typography.fontSize.base};
-  color: ${({ theme }) => theme.colors.text.secondary};
-  margin-bottom: ${({ theme }) => theme.spacing.lg};
-`;
-
 interface ExaminationNote {
   id: string;
   title: string;

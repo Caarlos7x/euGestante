@@ -143,16 +143,6 @@ const ErrorMessage = styled.div`
   margin-top: ${({ theme }) => theme.spacing.md};
 `;
 
-const SuccessMessage = styled.div`
-  padding: ${({ theme }) => theme.spacing.md};
-  background-color: ${({ theme }) => theme.colors.success.light};
-  color: ${({ theme }) => theme.colors.success.main};
-  border-radius: ${({ theme }) => theme.borderRadius.md};
-  font-size: ${({ theme }) => theme.typography.fontSize.sm};
-  text-align: center;
-  margin-top: ${({ theme }) => theme.spacing.md};
-`;
-
 const ConfigMessage = styled.div`
   padding: ${({ theme }) => theme.spacing.lg};
   background-color: ${({ theme }) => theme.colors.info.light};
