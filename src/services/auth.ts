@@ -104,7 +104,21 @@ export const authService = {
       // Safari iOS: usar redirect diretamente (mais confiável)
       if (isSafariIOS) {
         logger.debug('Safari iOS detectado: usando redirect diretamente...');
+        logger.debug('URL antes do redirect:', window.location.href);
+        logger.debug('Auth Domain:', auth?.app.options.authDomain);
+        logger.debug('Provider configurado:', provider.providerId);
+        
+        // Salvar timestamp para verificar se o redirect foi iniciado
+        try {
+          sessionStorage.setItem('firebase:redirect:started', Date.now().toString());
+          logger.debug('Timestamp salvo em sessionStorage');
+        } catch (e) {
+          logger.debug('Erro ao salvar timestamp:', e);
+        }
+        
         await signInWithRedirect(auth!, provider);
+        // Se chegou aqui, o redirect não foi feito (não deveria acontecer)
+        logger.error('signInWithRedirect retornou sem fazer redirect!');
         throw new Error('Redirect iniciado');
       }
 

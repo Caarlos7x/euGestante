@@ -100,6 +100,22 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
                                    window.location.hash.includes('state=');
         logger.debug('Verificando URL para parâmetros de redirect:', hasRedirectParams);
         logger.debug('URL completa:', window.location.href);
+        logger.debug('URL search:', window.location.search);
+        logger.debug('URL hash:', window.location.hash);
+        
+        // Verificar se o redirect foi iniciado (timestamp em sessionStorage)
+        try {
+          const redirectStarted = sessionStorage.getItem('firebase:redirect:started');
+          if (redirectStarted) {
+            const timeDiff = Date.now() - parseInt(redirectStarted);
+            logger.debug('Redirect foi iniciado há', timeDiff, 'ms');
+            sessionStorage.removeItem('firebase:redirect:started');
+          } else {
+            logger.debug('Nenhum timestamp de redirect encontrado - pode não ter havido redirect');
+          }
+        } catch (e) {
+          logger.debug('Erro ao verificar sessionStorage:', e);
+        }
         
         for (let attempt = 1; attempt <= maxAttempts; attempt++) {
           logger.debug(`Tentativa ${attempt}/${maxAttempts} - Aguardando ${delay}ms...`);
