@@ -321,31 +321,37 @@ export const Login: React.FC = () => {
 
   const handleGoogleLogin = async () => {
     setErrorMessage(null);
+    logger.debug('handleGoogleLogin: Iniciando login com Google');
 
     if (!firebaseConfigured) {
+      logger.error('handleGoogleLogin: Firebase não configurado');
       setErrorMessage('Firebase não está configurado. Configure o arquivo .env.local com suas credenciais.');
       return;
     }
 
     setIsLoading(true);
+    logger.debug('handleGoogleLogin: setIsLoading(true)');
 
     try {
-      // Login com Google iniciado
-      
+      logger.debug('handleGoogleLogin: Chamando signInWithGoogle...');
       await signInWithGoogle();
+      logger.debug('handleGoogleLogin: signInWithGoogle concluído');
       // O redirecionamento será feito pelo useEffect quando o user mudar
     } catch (error: any) {
-      // Erro no login Google (já tratado pelo getAuthErrorMessage)
+      logger.error('handleGoogleLogin: Erro capturado:', error?.code || error?.message || error);
       
       // Ignorar erro de redirect iniciado (a página será redirecionada)
       if (error.message === 'Redirect iniciado') {
+        logger.debug('handleGoogleLogin: Redirect iniciado, aguardando...');
         return;
       }
       
       // Mostrar mensagem de erro amigável
       const errorMessage = error?.message || 'Erro ao fazer login com Google. Tente novamente.';
+      logger.error('handleGoogleLogin: Mensagem de erro:', errorMessage);
       setErrorMessage(errorMessage);
       setIsLoading(false);
+      logger.debug('handleGoogleLogin: setIsLoading(false)');
     }
   };
 
