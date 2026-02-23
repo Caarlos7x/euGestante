@@ -244,11 +244,25 @@ export const Login: React.FC = () => {
   // Atualizar logs de debug
   useEffect(() => {
     if (isSafariIOS) {
-      const interval = setInterval(() => {
+      const updateLogs = () => {
         const logs = logger.getDebugLogs();
         setDebugLogs(logs);
-      }, 500);
-      return () => clearInterval(interval);
+      };
+      
+      // Atualizar imediatamente
+      updateLogs();
+      
+      // Atualizar a cada 500ms
+      const interval = setInterval(updateLogs, 500);
+      
+      // Ouvir evento de atualização
+      const handleLogUpdate = () => updateLogs();
+      window.addEventListener('debugLogUpdated', handleLogUpdate);
+      
+      return () => {
+        clearInterval(interval);
+        window.removeEventListener('debugLogUpdated', handleLogUpdate);
+      };
     }
   }, [isSafariIOS]);
 
@@ -453,7 +467,14 @@ export const Login: React.FC = () => {
             variant="outline"
             size="lg"
             fullWidth
-            onClick={handleGoogleLogin}
+            onClick={(e) => {
+              e.preventDefault();
+              logger.debug('=== BOTÃO CLICADO ===');
+              logger.debug('Botão Google clicado!');
+              logger.debug('isLoading:', isLoading);
+              logger.debug('firebaseConfigured:', firebaseConfigured);
+              handleGoogleLogin();
+            }}
             disabled={isLoading}
           >
             {isLoading ? 'Aguarde...' : 'Continuar com Google'}

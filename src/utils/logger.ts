@@ -11,13 +11,23 @@ const MAX_DEBUG_LOGS = 20;
 
 const addDebugLog = (message: string) => {
   const timestamp = new Date().toLocaleTimeString();
-  debugLogs.push(`[${timestamp}] ${message}`);
+  const logMessage = `[${timestamp}] ${message}`;
+  debugLogs.push(logMessage);
   if (debugLogs.length > MAX_DEBUG_LOGS) {
     debugLogs.shift();
   }
   // Em Safari iOS, sempre logar no console também
   if (isSafariIOS || isDevelopment) {
-    console.log(`[DEBUG] ${message}`);
+    console.log(`[DEBUG] ${logMessage}`);
+  }
+  // Forçar atualização do array para garantir que seja detectado
+  if (isSafariIOS) {
+    // Disparar evento customizado para forçar atualização
+    try {
+      window.dispatchEvent(new CustomEvent('debugLogUpdated'));
+    } catch (e) {
+      // Ignorar erro se não suportar
+    }
   }
 };
 
