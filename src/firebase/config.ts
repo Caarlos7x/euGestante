@@ -1,0 +1,73 @@
+import { initializeApp, FirebaseApp } from 'firebase/app';
+import { getAuth, Auth, setPersistence, browserLocalPersistence } from 'firebase/auth';
+import { getFirestore, Firestore } from 'firebase/firestore';
+
+const firebaseConfig = {
+  apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
+  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
+  appId: import.meta.env.VITE_FIREBASE_APP_ID,
+  storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
+  messagingSenderId: import.meta.env.VITE_FIREBASE_MESSAGING_SENDER_ID,
+};
+
+// Validação das variáveis de ambiente
+const requiredEnvVars = [
+  'VITE_FIREBASE_API_KEY',
+  'VITE_FIREBASE_AUTH_DOMAIN',
+  'VITE_FIREBASE_PROJECT_ID',
+  'VITE_FIREBASE_APP_ID',
+];
+
+const missingVars = requiredEnvVars.filter(
+  (varName) => !import.meta.env[varName]
+);
+
+if (missingVars.length > 0 && import.meta.env.DEV) {
+    console.warn(
+      `Variáveis de ambiente do Firebase faltando: ${missingVars.join(', ')}`
+    );
+  console.warn('Configure um arquivo .env.local com as credenciais do Firebase');
+}
+
+// Inicializar Firebase
+let app: FirebaseApp | null = null;
+let auth: Auth | null = null;
+let db: Firestore | null = null;
+
+// Só inicializar se todas as variáveis necessárias estiverem presentes
+const hasAllRequiredVars = requiredEnvVars.every(
+  (varName) => import.meta.env[varName] && import.meta.env[varName] !== 'your-api-key-here'
+);
+
+if (hasAllRequiredVars) {
+  try {
+    app = initializeApp(firebaseConfig);
+    auth = getAuth(app);
+    db = getFirestore(app);
+
+    // Configurar persistência para melhor suporte em mobile
+    setPersistence(auth, browserLocalPersistence).catch((error) => {
+      console.error('Erro ao configurar persistência do Firebase:', error);
+    });
+  } catch (error) {
+    console.error('Erro ao inicializar Firebase:', error);
+    // Não lançar erro em desenvolvimento para permitir desenvolvimento sem Firebase
+    if (import.meta.env.PROD) {
+      throw error;
+    }
+  }
+} else {
+    console.warn(
+      'Firebase não inicializado. Configure as variáveis de ambiente em .env.local'
+    );
+}
+
+// Exportar com tipos corretos
+export { app, auth, db };
+export default app;
+
+// Helper para verificar se Firebase está configurado
+export const isFirebaseConfigured = (): boolean => {
+  return app !== null && auth !== null && db !== null;
+};

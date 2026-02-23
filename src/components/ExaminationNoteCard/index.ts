@@ -1,0 +1,1 @@
+export { ExaminationNoteCard } from './ExaminationNoteCard';
