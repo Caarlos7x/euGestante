@@ -2,9 +2,30 @@ import { initializeApp, FirebaseApp } from 'firebase/app';
 import { getAuth, Auth, setPersistence, browserLocalPersistence } from 'firebase/auth';
 import { getFirestore, Firestore } from 'firebase/firestore';
 
+// Garantir que authDomain tenha o formato correto
+const getAuthDomain = (): string => {
+  const authDomain = import.meta.env.VITE_FIREBASE_AUTH_DOMAIN;
+  const projectId = import.meta.env.VITE_FIREBASE_PROJECT_ID;
+  
+  // Se authDomain não estiver configurado ou estiver vazio, construir a partir do projectId
+  if (!authDomain || authDomain.trim() === '') {
+    if (projectId) {
+      return `${projectId}.firebaseapp.com`;
+    }
+    return '';
+  }
+  
+  // Se authDomain não tiver o protocolo e domínio completo, garantir que tenha
+  if (!authDomain.includes('.')) {
+    return `${authDomain}.firebaseapp.com`;
+  }
+  
+  return authDomain;
+};
+
 const firebaseConfig = {
   apiKey: import.meta.env.VITE_FIREBASE_API_KEY,
-  authDomain: import.meta.env.VITE_FIREBASE_AUTH_DOMAIN,
+  authDomain: getAuthDomain(),
   projectId: import.meta.env.VITE_FIREBASE_PROJECT_ID,
   appId: import.meta.env.VITE_FIREBASE_APP_ID,
   storageBucket: import.meta.env.VITE_FIREBASE_STORAGE_BUCKET,
