@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { User } from 'firebase/auth';
 import { authService, updateUserService } from '@/services/auth';
-import { profileService, UserProfile as ProfileData } from '@/services/profileService';
+import { profileService } from '@/services/profileService';
 import { isFirebaseConfigured } from '@/firebase/config';
 
 interface UserProfile {

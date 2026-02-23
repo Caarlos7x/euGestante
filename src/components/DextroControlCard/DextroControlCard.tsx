@@ -8,9 +8,10 @@ import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Tooltip } from '@/components/Tooltip';
 import { useAuth } from '@/contexts/AuthContext';
-import { dextroService, DextroRecord } from '@/services/dextroService';
+import { dextroService } from '@/services/dextroService';
 
-interface DextroRecord {
+// Interface local para o componente (sem userId, será adicionado no serviço)
+interface LocalDextroRecord {
   id: string;
   date: string;
   jejum: string;
@@ -244,11 +245,12 @@ const DateInputWrapper = styled.div`
   }
 `;
 
-const ModalActions = styled.div`
-  display: flex;
-  justify-content: flex-end;
-  gap: ${({ theme }) => theme.spacing.md};
-  margin-top: ${({ theme }) => theme.spacing.lg};
+const DeleteButton = styled(Button)`
+  color: #ef4444 !important;
+  
+  &:hover {
+    color: #dc2626 !important;
+  }
 `;
 
 const EmptyState = styled.div`
@@ -507,7 +509,7 @@ export const DextroControlCard: React.FC = () => {
         'Jejum (mg/dL)': record.jejum || '-',
         '1h pós almoço (mg/dL)': record.umaHoraPosAlmoco || '-',
         'Pré almoço (mg/dL)': record.preAlmoco || '-',
-        '1h pós almoço (mg/dL)': record.umaHoraPosAlmoco2 || '-',
+        '1h pós almoço 2 (mg/dL)': record.umaHoraPosAlmoco2 || '-',
         'Pré jantar (mg/dL)': record.preJantar || '-',
         '1h pós jantar (mg/dL)': record.umaHoraPosJantar || '-',
       }));
@@ -638,14 +640,13 @@ export const DextroControlCard: React.FC = () => {
                         >
                           Editar
                         </Button>
-                        <Button
+                        <DeleteButton
                           variant="text"
                           size="sm"
                           onClick={() => handleDeleteRecord(record.id)}
-                          style={{ color: '#ef4444' }}
                         >
                           Excluir
-                        </Button>
+                        </DeleteButton>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -657,8 +658,8 @@ export const DextroControlCard: React.FC = () => {
                     <Input
                       type="date"
                       value={newRecord.date || ''}
-                      onChange={(e) =>
-                        setNewRecord({ ...newRecord, date: e.target.value })
+                      onChange={(value) =>
+                        setNewRecord({ ...newRecord, date: value })
                       }
                       fullWidth
                     />

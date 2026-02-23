@@ -6,7 +6,7 @@ import { Modal } from '@/components/Modal';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { useAuth } from '@/contexts/AuthContext';
-import { medicationService, Medication } from '@/services/medicationService';
+import { medicationService } from '@/services/medicationService';
 import { requestNotificationPermission, isNotificationEnabled, scheduleNotification, cancelScheduledNotification } from '@/utils/notifications';
 
 interface LocalMedication {
@@ -299,52 +299,50 @@ export const MedicationCard: React.FC = () => {
     }
   };
 
-  const scheduleAllNotifications = () => {
+  const scheduleAllNotifications = async () => {
     if (!notificationPermission) return;
 
     const now = new Date();
     const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
 
-    medications
-      .filter((med) => med.active)
-      .forEach((medication) => {
-        medication.times.forEach((timeStr) => {
-          const key = `${medication.id}-${timeStr}`;
+    for (const medication of medications.filter((med) => med.active)) {
+      for (const timeStr of medication.times) {
+        const key = `${medication.id}-${timeStr}`;
+        
+        // Se já existe uma notificação agendada para este horário, não criar outra
+        if (notificationTimeoutsRef.current.has(key)) {
+          continue;
+        }
+
+        const [hours, minutes] = timeStr.split(':').map(Number);
+        const scheduledTime = new Date(today);
+        scheduledTime.setHours(hours, minutes, 0, 0);
+
+        // Se o horário já passou hoje, agendar para amanhã
+        if (scheduledTime <= now) {
+          scheduledTime.setDate(scheduledTime.getDate() + 1);
+        }
+
+        const tag = `medication-${medication.id}-${timeStr}`;
+        const timeoutId = await scheduleNotification(
+          `Hora de tomar: ${medication.name}`,
+          scheduledTime,
+          {
+            body: `Lembrete: ${medication.name} às ${timeStr}${medication.notes ? ` - ${medication.notes}` : ''}`,
+            tag,
+          }
+        );
+
+        if (timeoutId !== null) {
+          notificationTimeoutsRef.current.set(key, timeoutId);
           
-          // Se já existe uma notificação agendada para este horário, não criar outra
-          if (notificationTimeoutsRef.current.has(key)) {
-            return;
-          }
-
-          const [hours, minutes] = timeStr.split(':').map(Number);
-          const scheduledTime = new Date(today);
-          scheduledTime.setHours(hours, minutes, 0, 0);
-
-          // Se o horário já passou hoje, agendar para amanhã
-          if (scheduledTime <= now) {
-            scheduledTime.setDate(scheduledTime.getDate() + 1);
-          }
-
-          const tag = `medication-${medication.id}-${timeStr}`;
-          const timeoutId = scheduleNotification(
-            `Hora de tomar: ${medication.name}`,
-            scheduledTime,
-            {
-              body: `Lembrete: ${medication.name} às ${timeStr}${medication.notes ? ` - ${medication.notes}` : ''}`,
-              tag,
-            }
-          );
-
-          if (timeoutId !== null) {
-            notificationTimeoutsRef.current.set(key, timeoutId);
-            
-            // Quando a notificação for exibida, remover da lista para poder reagendar
-            setTimeout(() => {
-              notificationTimeoutsRef.current.delete(key);
-            }, scheduledTime.getTime() - now.getTime() + 1000);
-          }
-        });
-      });
+          // Quando a notificação for exibida, remover da lista para poder reagendar
+          setTimeout(() => {
+            notificationTimeoutsRef.current.delete(key);
+          }, scheduledTime.getTime() - now.getTime() + 1000);
+        }
+      }
+    }
   };
 
   const handleAddTime = () => {
@@ -493,7 +491,6 @@ export const MedicationCard: React.FC = () => {
               variant="outline"
               size="sm"
               onClick={handleRequestNotificationPermission}
-              style={{ marginLeft: '1rem' }}
             >
               Habilitar Notificações
             </Button>

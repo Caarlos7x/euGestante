@@ -8,7 +8,7 @@ import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Tooltip } from '@/components/Tooltip';
 import { useAuth } from '@/contexts/AuthContext';
-import { bloodPressureService, BloodPressureRecord } from '@/services/bloodPressureService';
+import { bloodPressureService } from '@/services/bloodPressureService';
 
 // Interface local para o componente (sem userId, será adicionado no serviço)
 interface LocalBloodPressureRecord {
@@ -227,6 +227,14 @@ const DateInputWrapper = styled.div`
       font-size: ${({ theme }) => theme.typography.fontSize.xs} !important;
       padding: ${({ theme }) => theme.spacing.xs} !important;
     }
+  }
+`;
+
+const DeleteButton = styled(Button)`
+  color: #ef4444 !important;
+  
+  &:hover {
+    color: #dc2626 !important;
   }
 `;
 
@@ -546,14 +554,13 @@ export const BloodPressureControlCard: React.FC = () => {
                         >
                           Editar
                         </Button>
-                        <Button
+                        <DeleteButton
                           variant="text"
                           size="sm"
                           onClick={() => handleDeleteRecord(record.id)}
-                          style={{ color: '#ef4444' }}
                         >
                           Excluir
-                        </Button>
+                        </DeleteButton>
                       </div>
                     </TableCell>
                   </TableRow>
@@ -565,8 +572,8 @@ export const BloodPressureControlCard: React.FC = () => {
                     <Input
                       type="date"
                       value={newRecord.date || ''}
-                      onChange={(e) =>
-                        setNewRecord({ ...newRecord, date: e.target.value })
+                      onChange={(value) =>
+                        setNewRecord({ ...newRecord, date: value })
                       }
                       fullWidth
                     />

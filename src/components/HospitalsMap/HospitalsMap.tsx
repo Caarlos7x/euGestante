@@ -53,31 +53,11 @@ const LoadingMessage = styled.div`
   font-size: ${({ theme }) => theme.typography.fontSize.base};
 `;
 
-const ErrorMessage = styled.div`
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  height: 100%;
-  color: ${({ theme }) => theme.colors.text.secondary};
-  font-size: ${({ theme }) => theme.typography.fontSize.base};
-  padding: ${({ theme }) => theme.spacing.xl};
-  text-align: center;
-  gap: ${({ theme }) => theme.spacing.md};
-`;
-
 const ErrorTitle = styled.h3`
   color: ${({ theme }) => theme.colors.error.main};
   font-size: ${({ theme }) => theme.typography.fontSize.lg};
   font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
   margin: 0;
-`;
-
-const ErrorText = styled.p`
-  color: ${({ theme }) => theme.colors.text.secondary};
-  font-size: ${({ theme }) => theme.typography.fontSize.sm};
-  margin: 0;
-  line-height: ${({ theme }) => theme.typography.lineHeight.relaxed};
 `;
 
 const PopupContent = styled.div`
@@ -181,7 +161,7 @@ export const HospitalsMap: React.FC = () => {
   const mapCenter = userLocation || defaultCenter;
 
   return (
-    <MapContainerWrapper padding="none" elevation="sm">
+    <MapContainerWrapper padding="lg" elevation="sm">
       <MapContainer
         center={mapCenter}
         zoom={defaultZoom}

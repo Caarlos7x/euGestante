@@ -74,11 +74,11 @@ export function showNotification(title: string, options?: NotificationOptions): 
  * Agenda uma notificação para um horário específico
  * Tenta usar Service Worker primeiro (funciona em background), depois fallback para setTimeout
  */
-export function scheduleNotification(
+export async function scheduleNotification(
   title: string,
   scheduledTime: Date,
   options?: NotificationOptions
-): number | null {
+): Promise<number | null> {
   if (!isNotificationEnabled()) {
     console.warn('Notificações não estão habilitadas');
     return null;
@@ -97,7 +97,7 @@ export function scheduleNotification(
 
   // Tentar usar Service Worker primeiro (funciona melhor em background/mobile)
   if (isServiceWorkerSupported()) {
-    const scheduled = scheduleNotificationInSW(
+    const scheduled = await scheduleNotificationInSW(
       title,
       body,
       tag,

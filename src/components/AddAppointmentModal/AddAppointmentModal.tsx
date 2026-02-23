@@ -6,7 +6,6 @@ import { Button } from '@/components/Button';
 import { AddressAutocomplete } from '@/components/AddressAutocomplete';
 import { appointmentService, Appointment } from '@/services/appointmentService';
 import { useAuth } from '@/contexts/AuthContext';
-import { FaPlus } from 'react-icons/fa';
 
 interface AddAppointmentModalProps {
   isOpen: boolean;
@@ -106,7 +105,7 @@ export const AddAppointmentModal: React.FC<AddAppointmentModalProps> = ({
   const [error, setError] = useState<string | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
-  const handleAddressSelect = (selectedAddress: string, placeId?: string) => {
+  const handleAddressSelect = (selectedAddress: string) => {
     setAddress(selectedAddress);
     // Se não tiver nome do hospital, tentar extrair do endereço
     if (!hospitalName && selectedAddress) {

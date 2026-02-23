@@ -1,6 +1,6 @@
 // Serviço para buscar endereços usando Google Places API
 
-interface PlacePrediction {
+export interface PlacePrediction {
   description: string;
   place_id: string;
   structured_formatting: {
@@ -9,7 +9,7 @@ interface PlacePrediction {
   };
 }
 
-interface PlaceDetails {
+export interface PlaceDetails {
   formatted_address: string;
   name?: string;
   geometry: {
