@@ -168,16 +168,22 @@ export const authService = {
   // Processar resultado do redirect do Google
   async getRedirectResult(): Promise<UserCredential | null> {
     if (!isFirebaseConfigured() || !auth) {
+      logger.debug('getRedirectResult: Firebase não configurado ou auth não disponível');
       return null;
     }
     try {
-      return await getRedirectResult(auth);
+      logger.debug('getRedirectResult: Chamando Firebase getRedirectResult...');
+      const result = await getRedirectResult(auth);
+      logger.debug('getRedirectResult: Resultado recebido:', result ? `usuário: ${result.user?.email}` : 'null');
+      return result;
     } catch (error: any) {
+      logger.error('getRedirectResult: Erro:', error?.code || error?.message || error);
       // Ignorar erros de cancelamento
       if (
         error?.code === 'auth/popup-closed-by-user' ||
         error?.code === 'auth/cancelled-popup-request'
       ) {
+        logger.debug('getRedirectResult: Login cancelado pelo usuário');
         return null;
       }
       logger.error('Erro no redirect do Google:', error);

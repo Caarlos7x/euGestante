@@ -3,6 +3,7 @@ import { User } from 'firebase/auth';
 import { authService, updateUserService } from '@/services/auth';
 import { profileService } from '@/services/profileService';
 import { isFirebaseConfigured } from '@/firebase/config';
+import { logger } from '@/utils/logger';
 
 interface UserProfile {
   id?: string;
@@ -82,22 +83,38 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // No Safari iOS, pode levar um tempo para processar o redirect
     const processRedirect = async () => {
       try {
+        logger.debug('Iniciando processamento de redirect...');
+        
         // Aguardar um pouco antes de processar o redirect no Safari iOS
         // Isso garante que a página tenha carregado completamente
         await new Promise(resolve => setTimeout(resolve, 200));
+        logger.debug('Aguardou 200ms, chamando getRedirectResult...');
         
         const result = await authService.getRedirectResult();
+        logger.debug('getRedirectResult retornou:', result ? 'resultado encontrado' : 'null', result?.user?.email || 'sem email');
+        
         if (result?.user) {
+          logger.debug('Usuário encontrado no redirect:', result.user.email);
           // Se houver resultado, aguardar mais tempo para garantir que o Firebase processe completamente
           // Isso é especialmente importante no Safari iOS
           await new Promise(resolve => setTimeout(resolve, 1000));
+          logger.debug('Aguardou 1000ms, definindo usuário...');
+          
           // O onAuthStateChanged vai atualizar o estado automaticamente
           // Mas também vamos garantir que o usuário seja definido aqui
           setUser(result.user);
+          logger.debug('Usuário definido no estado');
+          
           await loadProfile(result.user);
+          logger.debug('Perfil carregado');
+        } else {
+          logger.debug('Nenhum resultado de redirect encontrado');
         }
         setLoading(false);
+        logger.debug('Loading definido como false');
       } catch (error: any) {
+        logger.error('Erro ao processar redirect:', error?.code || error?.message || error);
+        
         // Ignorar erros quando Firebase não está configurado
         if (error.message?.includes('Firebase não está configurado')) {
           setLoading(false);
@@ -108,6 +125,7 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
           error?.code === 'auth/popup-closed-by-user' ||
           error?.code === 'auth/cancelled-popup-request'
         ) {
+          logger.debug('Login cancelado pelo usuário');
           setLoading(false);
           return;
         }
@@ -134,21 +152,30 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     let redirectProcessed = false;
 
     const unsubscribe = authService.onAuthStateChanged(async (currentUser) => {
+      logger.debug('onAuthStateChanged chamado:', currentUser ? `usuário: ${currentUser.email}` : 'usuário: null');
+      
       // No Safari iOS, após redirect, o onAuthStateChanged pode ser chamado antes do getRedirectResult
       // Aguardar um pouco mais para garantir que tudo seja processado
       if (isInitialLoad && !redirectProcessed) {
         isInitialLoad = false;
+        logger.debug('Primeiro carregamento, aguardando 800ms...');
         // Aguardar mais tempo no Safari iOS para garantir que o redirect seja processado
         await new Promise(resolve => setTimeout(resolve, 800));
         redirectProcessed = true;
+        logger.debug('Aguardou 800ms, processando...');
       }
 
       setUser(currentUser);
+      logger.debug('Usuário definido no estado via onAuthStateChanged:', currentUser?.email || 'null');
+      
       setLoading(false);
 
       if (currentUser) {
+        logger.debug('Carregando perfil do usuário...');
         await loadProfile(currentUser);
+        logger.debug('Perfil carregado com sucesso');
       } else {
+        logger.debug('Nenhum usuário, limpando perfil');
         setProfile(null);
       }
     });

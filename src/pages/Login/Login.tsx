@@ -9,6 +9,7 @@ import { getEmailError, getPasswordError } from '@/utils/validation';
 import { LoginFormData } from '@/types';
 import { useAuth } from '@/contexts/AuthContext';
 import { isFirebaseConfigured } from '@/firebase/config';
+import { logger } from '@/utils/logger';
 
 const LoginContainer = styled.div`
   min-height: 100vh;
@@ -170,6 +171,49 @@ const ConfigMessage = styled.div`
   }
 `;
 
+const DebugPanel = styled.div`
+  position: fixed;
+  bottom: 1rem;
+  right: 1rem;
+  max-width: 20rem;
+  max-height: 15rem;
+  overflow-y: auto;
+  background-color: rgba(0, 0, 0, 0.85);
+  color: #fff;
+  padding: ${({ theme }) => theme.spacing.md};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
+  font-size: 0.75rem;
+  font-family: 'Courier New', monospace;
+  z-index: 9999;
+  display: none;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
+    display: block;
+    max-width: calc(100% - 2rem);
+    max-height: 10rem;
+  }
+
+  .debug-title {
+    font-weight: bold;
+    margin-bottom: ${({ theme }) => theme.spacing.xs};
+    color: #4CAF50;
+  }
+
+  .debug-log {
+    margin: 0.25rem 0;
+    word-break: break-word;
+    line-height: 1.4;
+  }
+
+  .debug-error {
+    color: #f44336;
+  }
+
+  .debug-warn {
+    color: #ff9800;
+  }
+`;
+
 export const Login: React.FC = () => {
   const navigate = useNavigate();
   const { user, loading: authLoading, signInWithEmail, signUpWithEmail, signInWithGoogle } = useAuth();
@@ -191,6 +235,21 @@ export const Login: React.FC = () => {
   const [isLoading, setIsLoading] = useState(false);
   const [errorMessage, setErrorMessage] = useState<string | null>(null);
   const [isSignUp, setIsSignUp] = useState(false);
+  const [debugLogs, setDebugLogs] = useState<string[]>([]);
+
+  // Detectar Safari iOS
+  const isSafariIOS = /iPhone|iPad|iPod/.test(navigator.userAgent) && /Safari/.test(navigator.userAgent) && !/Chrome|CriOS|FxiOS/.test(navigator.userAgent);
+
+  // Atualizar logs de debug
+  useEffect(() => {
+    if (isSafariIOS) {
+      const interval = setInterval(() => {
+        const logs = logger.getDebugLogs();
+        setDebugLogs(logs);
+      }, 500);
+      return () => clearInterval(interval);
+    }
+  }, [isSafariIOS]);
 
   // Redirecionar se já estiver autenticado
   useEffect(() => {
@@ -410,6 +469,25 @@ export const Login: React.FC = () => {
           </SignUpLink>
         </Card>
       </LoginContent>
+      
+      {/* Painel de debug apenas no Safari iOS */}
+      {isSafariIOS && debugLogs.length > 0 && (
+        <DebugPanel>
+          <div className="debug-title">🔍 Debug Safari iOS</div>
+          {debugLogs.slice(-10).map((log: string, index: number) => {
+            const isError = log.includes('ERROR');
+            const isWarn = log.includes('WARN');
+            return (
+              <div 
+                key={index} 
+                className={`debug-log ${isError ? 'debug-error' : isWarn ? 'debug-warn' : ''}`}
+              >
+                {log}
+              </div>
+            );
+          })}
+        </DebugPanel>
+      )}
     </LoginContainer>
   );
 };
