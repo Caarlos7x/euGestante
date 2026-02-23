@@ -467,8 +467,7 @@ export const Login: React.FC = () => {
             variant="outline"
             size="lg"
             fullWidth
-            onClick={(e) => {
-              e.preventDefault();
+            onClick={() => {
               logger.debug('=== BOTÃO CLICADO ===');
               logger.debug('Botão Google clicado!');
               logger.debug('isLoading:', isLoading);
