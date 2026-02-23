@@ -1,0 +1,17 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+  <defs>
+    <style>
+      .purple { fill: #8B4A9C; }
+      .purple-light { fill: #B57BC5; }
+    </style>
+  </defs>
+  <!-- Background circle -->
+  <circle cx="50" cy="50" r="48" class="purple-light" opacity="0.2"/>
+  <!-- Simplified logo representation in purple -->
+  <circle cx="50" cy="50" r="40" class="purple" opacity="0.1"/>
+  <!-- Heart shape (representing care) -->
+  <path d="M50 35 C45 30, 35 30, 35 40 C35 45, 50 60, 50 60 C50 60, 65 45, 65 40 C65 30, 55 30, 50 35 Z" class="purple"/>
+  <!-- Plus sign (representing health/medical) -->
+  <rect x="45" y="55" width="10" height="3" rx="1" class="purple"/>
+  <rect x="48.5" y="52" width="3" height="10" rx="1" class="purple"/>
+</svg>
