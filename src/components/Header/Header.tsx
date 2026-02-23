@@ -42,8 +42,8 @@ const LogoImage = styled.img`
   width: 80px;
   height: 80px;
   object-fit: contain;
-  /* Filtro CSS para aplicar cor roxa #8B4A9C */
-  filter: brightness(0) saturate(100%) invert(27%) sepia(89%) saturate(1234%) hue-rotate(258deg) brightness(95%) contrast(89%);
+  /* Filtro CSS para aplicar cor roxa #8B4A9C - ajustado para roxo puro */
+  filter: brightness(0) saturate(100%) invert(35%) sepia(100%) saturate(2000%) hue-rotate(260deg) brightness(0.9) contrast(1.1);
 
   @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
     width: 4rem; /* 48px - manter tamanho razoável */

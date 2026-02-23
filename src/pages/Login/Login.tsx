@@ -40,14 +40,15 @@ const LogoImage = styled.img`
   width: 10rem; /* 120px baseado em 12px */
   height: 10rem; /* 120px baseado em 12px */
   object-fit: contain;
-  /* Filter para cor roxa #8B4A9C - ajustado para garantir cor roxa e não rosa */
-  filter: brightness(0) saturate(100%) invert(54%) sepia(93%) saturate(1352%) hue-rotate(248deg) brightness(95%) contrast(85%);
+  /* Filter para cor roxa #8B4A9C - ajustado para roxo puro, não rosa */
+  /* Usando valores mais precisos para garantir roxo #8B4A9C */
+  filter: brightness(0) saturate(100%) invert(35%) sepia(100%) saturate(2000%) hue-rotate(260deg) brightness(0.9) contrast(1.1);
 
   @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
     width: 12rem; /* 144px em mobile - aumentado */
     height: 12rem; /* 144px em mobile - aumentado */
     /* Filter para cor roxa #8B4A9C - mesmo filter para consistência */
-    filter: brightness(0) saturate(100%) invert(54%) sepia(93%) saturate(1352%) hue-rotate(248deg) brightness(95%) contrast(85%);
+    filter: brightness(0) saturate(100%) invert(35%) sepia(100%) saturate(2000%) hue-rotate(260deg) brightness(0.9) contrast(1.1);
   }
 `;
 

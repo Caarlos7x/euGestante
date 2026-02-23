@@ -45,7 +45,7 @@ const FooterLogo = styled.img`
   width: 2.5rem; /* 30px baseado em 12px */
   height: 2.5rem; /* 30px baseado em 12px */
   object-fit: contain;
-  filter: brightness(0) saturate(100%) invert(27%) sepia(89%) saturate(1234%) hue-rotate(258deg) brightness(95%) contrast(89%);
+  filter: brightness(0) saturate(100%) invert(35%) sepia(100%) saturate(2000%) hue-rotate(260deg) brightness(0.9) contrast(1.1);
 `;
 
 const FooterBrandText = styled(Link)`
