@@ -39,12 +39,14 @@ const LogoImage = styled.img`
   width: 10rem; /* 120px baseado em 12px */
   height: 10rem; /* 120px baseado em 12px */
   object-fit: contain;
-  filter: brightness(0) saturate(100%) invert(27%) sepia(89%) saturate(1234%) hue-rotate(258deg) brightness(95%) contrast(89%);
+  /* Filter para cor roxa #8B4A9C - ajustado para garantir cor roxa e não rosa */
+  filter: brightness(0) saturate(100%) invert(54%) sepia(93%) saturate(1352%) hue-rotate(248deg) brightness(95%) contrast(85%);
 
   @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
     width: 12rem; /* 144px em mobile - aumentado */
     height: 12rem; /* 144px em mobile - aumentado */
-    filter: brightness(0) saturate(100%) invert(27%) sepia(89%) saturate(1234%) hue-rotate(258deg) brightness(95%) contrast(89%);
+    /* Filter para cor roxa #8B4A9C - mesmo filter para consistência */
+    filter: brightness(0) saturate(100%) invert(54%) sepia(93%) saturate(1352%) hue-rotate(248deg) brightness(95%) contrast(85%);
   }
 `;
 

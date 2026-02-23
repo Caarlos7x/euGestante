@@ -82,12 +82,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     // No Safari iOS, pode levar um tempo para processar o redirect
     const processRedirect = async () => {
       try {
+        // Aguardar um pouco antes de processar o redirect no Safari iOS
+        // Isso garante que a página tenha carregado completamente
+        await new Promise(resolve => setTimeout(resolve, 200));
+        
         const result = await authService.getRedirectResult();
         if (result?.user) {
-          // Se houver resultado, aguardar um pouco para garantir que o Firebase processe
+          // Se houver resultado, aguardar mais tempo para garantir que o Firebase processe completamente
           // Isso é especialmente importante no Safari iOS
-          await new Promise(resolve => setTimeout(resolve, 500));
+          await new Promise(resolve => setTimeout(resolve, 1000));
           // O onAuthStateChanged vai atualizar o estado automaticamente
+          // Mas também vamos garantir que o usuário seja definido aqui
+          setUser(result.user);
+          await loadProfile(result.user);
         }
         setLoading(false);
       } catch (error: any) {
@@ -124,18 +131,19 @@ export const AuthProvider: React.FC<AuthProviderProps> = ({ children }) => {
     }
 
     let isInitialLoad = true;
+    let redirectProcessed = false;
 
     const unsubscribe = authService.onAuthStateChanged(async (currentUser) => {
-      setUser(currentUser);
-
-      // No primeiro carregamento, aguardar o processamento do redirect
-      if (isInitialLoad) {
+      // No Safari iOS, após redirect, o onAuthStateChanged pode ser chamado antes do getRedirectResult
+      // Aguardar um pouco mais para garantir que tudo seja processado
+      if (isInitialLoad && !redirectProcessed) {
         isInitialLoad = false;
-        // Aguardar um pouco para garantir que o redirect seja processado
-        // Isso é especialmente importante no Safari iOS
-        await new Promise(resolve => setTimeout(resolve, 300));
+        // Aguardar mais tempo no Safari iOS para garantir que o redirect seja processado
+        await new Promise(resolve => setTimeout(resolve, 800));
+        redirectProcessed = true;
       }
 
+      setUser(currentUser);
       setLoading(false);
 
       if (currentUser) {
