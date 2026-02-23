@@ -323,6 +323,8 @@ export const Login: React.FC = () => {
   const handleGoogleLogin = async () => {
     setErrorMessage(null);
     logger.debug('handleGoogleLogin: Iniciando login com Google');
+    logger.debug('handleGoogleLogin: User Agent:', navigator.userAgent);
+    logger.debug('handleGoogleLogin: URL atual:', window.location.href);
 
     if (!firebaseConfigured) {
       logger.error('handleGoogleLogin: Firebase não configurado');
@@ -335,15 +337,23 @@ export const Login: React.FC = () => {
 
     try {
       logger.debug('handleGoogleLogin: Chamando signInWithGoogle...');
+      logger.debug('handleGoogleLogin: Antes de chamar signInWithGoogle, URL:', window.location.href);
+      
       await signInWithGoogle();
+      
+      // Se chegou aqui, o redirect não foi feito (não deveria acontecer no Safari iOS)
+      logger.warn('handleGoogleLogin: signInWithGoogle retornou sem fazer redirect!');
       logger.debug('handleGoogleLogin: signInWithGoogle concluído');
       // O redirecionamento será feito pelo useEffect quando o user mudar
     } catch (error: any) {
       logger.error('handleGoogleLogin: Erro capturado:', error?.code || error?.message || error);
+      logger.debug('handleGoogleLogin: URL após erro:', window.location.href);
       
       // Ignorar erro de redirect iniciado (a página será redirecionada)
       if (error.message === 'Redirect iniciado') {
         logger.debug('handleGoogleLogin: Redirect iniciado, aguardando...');
+        logger.debug('handleGoogleLogin: URL no momento do redirect:', window.location.href);
+        // Não definir setIsLoading(false) aqui, pois a página será redirecionada
         return;
       }
       

@@ -73,6 +73,10 @@ export const authService = {
 
   // Login com Google
   async signInWithGoogle(): Promise<UserCredential> {
+    logger.debug('signInWithGoogle: Iniciando...');
+    logger.debug('signInWithGoogle: Firebase configurado?', isFirebaseConfigured());
+    logger.debug('signInWithGoogle: Auth disponível?', !!auth);
+    
     checkFirebaseConfig();
     const provider = new GoogleAuthProvider();
     provider.addScope('profile');
