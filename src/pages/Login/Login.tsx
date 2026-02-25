@@ -37,25 +37,23 @@ const LogoContainer = styled.div`
 `;
 
 const LogoImage = styled.img`
-  width: 10rem; /* 120px baseado em 12px */
-  height: 10rem; /* 120px baseado em 12px */
+  width: 10rem;
+  height: 10rem;
   object-fit: contain;
-  /* Filter para cor roxa #8B4A9C - ajustado para roxo puro, não rosa */
-  /* Usando valores mais precisos para garantir roxo #8B4A9C */
-  filter: brightness(0) saturate(100%) invert(35%) sepia(100%) saturate(2000%) hue-rotate(260deg) brightness(0.9) contrast(1.1);
+  /* Cor do projeto: verde CTA #059669 (design system) */
+  filter: brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(98%) contrast(92%);
 
   @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    width: 12rem; /* 144px em mobile - aumentado */
-    height: 12rem; /* 144px em mobile - aumentado */
-    /* Filter para cor roxa #8B4A9C - mesmo filter para consistência */
-    filter: brightness(0) saturate(100%) invert(35%) sepia(100%) saturate(2000%) hue-rotate(260deg) brightness(0.9) contrast(1.1);
+    width: 12rem;
+    height: 12rem;
+    filter: brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(98%) contrast(92%);
   }
 `;
 
 const LogoText = styled.h1`
   font-size: ${({ theme }) => theme.typography.fontSize['3xl']};
   font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
-  color: ${({ theme }) => theme.colors.primary.main};
+  color: ${({ theme }) => theme.colors.cta.main};
   margin: 0;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
@@ -65,7 +63,7 @@ const LogoText = styled.h1`
 
 const Subtitle = styled.p`
   font-size: ${({ theme }) => theme.typography.fontSize.base};
-  color: ${({ theme }) => theme.colors.text.secondary};
+  color: ${({ theme }) => theme.colors.cta.dark};
   text-align: center;
   margin: 0;
 
@@ -135,6 +133,21 @@ const SignUpLink = styled.p`
     &:hover {
       text-decoration: underline;
     }
+  }
+`;
+
+const SignUpToggleButton = styled.button`
+  background: none;
+  border: none;
+  font: inherit;
+  padding: 0;
+  cursor: pointer;
+  color: ${({ theme }) => theme.colors.primary.main};
+  font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
   }
 `;
 
@@ -385,7 +398,7 @@ export const Login: React.FC = () => {
       <LoginContainer>
         <LoginContent>
           <Card padding="lg" elevation="lg">
-            <Title>Carregando...</Title>
+            <Title>Carregando…</Title>
           </Card>
         </LoginContent>
       </LoginContainer>
@@ -410,7 +423,7 @@ export const Login: React.FC = () => {
           {!firebaseConfigured && (
             <ConfigMessage style={{ marginBottom: '1.5rem' }}>
               <strong>
-                <FaExclamationTriangle style={{ marginRight: '0.5rem', verticalAlign: 'middle' }} />
+                <FaExclamationTriangle aria-hidden style={{ marginRight: '0.5rem', verticalAlign: 'middle' }} />
                 Firebase não está configurado
               </strong>
               <br />
@@ -425,6 +438,7 @@ export const Login: React.FC = () => {
             <Input
               label="Email"
               type="email"
+              name="email"
               placeholder="seu@email.com"
               value={formData.email}
               onChange={handleEmailChange}
@@ -436,6 +450,7 @@ export const Login: React.FC = () => {
             <Input
               label="Senha"
               type="password"
+              name="password"
               placeholder="Digite sua senha"
               value={formData.password}
               onChange={handlePasswordChange}
@@ -455,7 +470,7 @@ export const Login: React.FC = () => {
               fullWidth
               disabled={isLoading}
             >
-              {isLoading ? (isSignUp ? 'Criando conta...' : 'Entrando...') : (isSignUp ? 'Criar conta' : 'Entrar')}
+              {isLoading ? (isSignUp ? 'Criando conta…' : 'Entrando…') : (isSignUp ? 'Criar conta' : 'Entrar')}
             </Button>
           </Form>
 
@@ -476,37 +491,35 @@ export const Login: React.FC = () => {
             }}
             disabled={isLoading}
           >
-            {isLoading ? 'Aguarde...' : 'Continuar com Google'}
+            {isLoading ? 'Aguarde…' : 'Continuar com Google'}
           </Button>
 
           <SignUpLink>
             {isSignUp ? (
               <>
                 Já tem uma conta?{' '}
-                <a
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
+                <SignUpToggleButton
+                  type="button"
+                  onClick={() => {
                     setIsSignUp(false);
                     setErrorMessage(null);
                   }}
                 >
                   Entrar
-                </a>
+                </SignUpToggleButton>
               </>
             ) : (
               <>
                 Não tem uma conta?{' '}
-                <a
-                  href="#"
-                  onClick={(e) => {
-                    e.preventDefault();
+                <SignUpToggleButton
+                  type="button"
+                  onClick={() => {
                     setIsSignUp(true);
                     setErrorMessage(null);
                   }}
                 >
                   Cadastre-se
-                </a>
+                </SignUpToggleButton>
               </>
             )}
           </SignUpLink>

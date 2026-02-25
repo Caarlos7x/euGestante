@@ -42,10 +42,11 @@ const FooterBrand = styled.div`
 `;
 
 const FooterLogo = styled.img`
-  width: 2.5rem; /* 30px baseado em 12px */
-  height: 2.5rem; /* 30px baseado em 12px */
+  width: 2.5rem;
+  height: 2.5rem;
   object-fit: contain;
-  filter: brightness(0) saturate(100%) invert(35%) sepia(100%) saturate(2000%) hue-rotate(260deg) brightness(0.9) contrast(1.1);
+  /* Cor do projeto: verde CTA #059669 */
+  filter: brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(98%) contrast(92%);
 `;
 
 const FooterBrandText = styled(Link)`
@@ -82,6 +83,11 @@ const FooterLink = styled(Link)`
   color: ${({ theme }) => theme.colors.text.secondary};
   text-decoration: none;
   transition: color ${({ theme }) => theme.transitions.fast};
+  /* Touch target mínimo 44px (responsive-design) */
+  display: inline-block;
+  min-height: 2.75rem;
+  line-height: 2.75rem;
+  padding: 0 ${({ theme }) => theme.spacing.sm};
 
   &:hover {
     color: ${({ theme }) => theme.colors.primary.main};

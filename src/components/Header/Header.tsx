@@ -32,6 +32,9 @@ const LogoLink = styled(Link)`
   gap: ${({ theme }) => theme.spacing.sm};
   text-decoration: none;
   transition: opacity ${({ theme }) => theme.transitions.fast};
+  /* Área de toque mínima 44px (responsive-design) */
+  min-height: 2.75rem;
+  padding: ${({ theme }) => theme.spacing.xs} 0;
 
   &:hover {
     opacity: 0.8;
@@ -42,12 +45,13 @@ const LogoImage = styled.img`
   width: 80px;
   height: 80px;
   object-fit: contain;
-  /* Filtro CSS para aplicar cor roxa #8B4A9C - ajustado para roxo puro */
-  filter: brightness(0) saturate(100%) invert(35%) sepia(100%) saturate(2000%) hue-rotate(260deg) brightness(0.9) contrast(1.1);
+  /* Cor do projeto: verde CTA #059669 (design system) */
+  filter: brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(98%) contrast(92%);
 
   @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    width: 4rem; /* 48px - manter tamanho razoável */
-    height: 4rem; /* 48px */
+    width: 4rem;
+    height: 4rem;
+    filter: brightness(0) saturate(100%) invert(48%) sepia(79%) saturate(2476%) hue-rotate(86deg) brightness(98%) contrast(92%);
   }
 `;
 
@@ -85,9 +89,19 @@ const UserNameContainer = styled.div`
   cursor: pointer;
   user-select: none;
   transition: opacity ${({ theme }) => theme.transitions.fast};
+  /* Touch target mínimo 44x44px (responsive-design / HIG) */
+  min-height: 2.75rem;
+  min-width: 2.75rem;
+  padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
+  border-radius: ${({ theme }) => theme.borderRadius.md};
 
   &:hover {
     opacity: 0.8;
+  }
+
+  @media (min-width: ${({ theme }) => theme.breakpoints.sm}) {
+    min-height: 2.75rem;
+    padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
   }
 `;
 
