@@ -16,7 +16,9 @@ const StyledButton = styled.button<{ $variant?: 'primary' | 'secondary' | 'outli
   justify-content: center;
   font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
   border-radius: ${({ theme }) => theme.borderRadius.lg};
-  transition: all ${({ theme }) => theme.transitions.normal};
+  transition: color 0.25s ease-in-out, background-color 0.25s ease-in-out,
+    border-color 0.25s ease-in-out, transform 0.25s ease-in-out,
+    box-shadow 0.25s ease-in-out, opacity 0.25s ease-in-out;
   cursor: pointer;
   opacity: 1;
   width: ${({ $fullWidth }) => ($fullWidth ? '100%' : 'auto')};
@@ -57,14 +59,14 @@ const StyledButton = styled.button<{ $variant?: 'primary' | 'secondary' | 'outli
   ${({ $variant, theme }) => {
     if ($variant === 'primary') {
       return `
-        background-color: ${theme.colors.primary.main};
-        color: ${theme.colors.primary.contrast};
-        border: 0.166rem solid ${theme.colors.primary.main}; /* 2px baseado em 12px */
+        background-color: ${theme.colors.cta.main};
+        color: ${theme.colors.cta.contrast};
+        border: 0.1875rem solid ${theme.colors.cta.main}; /* 3px */
 
         &:hover:not(:disabled) {
-          background-color: ${theme.colors.primary.dark};
-          border-color: ${theme.colors.primary.dark};
-          transform: translateY(-0.083rem); /* -1px baseado em 12px */
+          background-color: ${theme.colors.cta.dark};
+          border-color: ${theme.colors.cta.dark};
+          transform: translateY(-0.0625rem); /* -1px */
           box-shadow: ${theme.shadows.md};
         }
 

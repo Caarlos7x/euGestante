@@ -53,7 +53,7 @@ const LogoImage = styled.img`
 const LogoText = styled.h1`
   font-size: ${({ theme }) => theme.typography.fontSize['3xl']};
   font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
-  color: ${({ theme }) => theme.colors.cta.main};
+  color: #059669; /* Verde CTA do projeto - literal para compatibilidade com tema remoto */
   margin: 0;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
@@ -63,7 +63,7 @@ const LogoText = styled.h1`
 
 const Subtitle = styled.p`
   font-size: ${({ theme }) => theme.typography.fontSize.base};
-  color: ${({ theme }) => theme.colors.cta.dark};
+  color: #047857; /* Verde CTA dark - literal para compatibilidade com tema remoto */
   text-align: center;
   margin: 0;
 
@@ -438,7 +438,6 @@ export const Login: React.FC = () => {
             <Input
               label="Email"
               type="email"
-              name="email"
               placeholder="seu@email.com"
               value={formData.email}
               onChange={handleEmailChange}
@@ -450,7 +449,6 @@ export const Login: React.FC = () => {
             <Input
               label="Senha"
               type="password"
-              name="password"
               placeholder="Digite sua senha"
               value={formData.password}
               onChange={handlePasswordChange}

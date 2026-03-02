@@ -10,9 +10,13 @@ import { Home } from '@/pages/Home';
 import { MyNotes } from '@/pages/MyNotes';
 import { registerServiceWorker } from '@/utils/serviceWorker';
 
+let swDidInit = false;
+
 function App() {
-  // Registrar Service Worker na inicialização
+  // Registrar Service Worker apenas uma vez por carga da aplicação (evita duplo registro em dev/remount)
   useEffect(() => {
+    if (swDidInit) return;
+    swDidInit = true;
     registerServiceWorker();
   }, []);
 

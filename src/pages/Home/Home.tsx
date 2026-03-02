@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState, lazy, Suspense } from 'react';
 import styled from 'styled-components';
 import { FaPlus } from 'react-icons/fa';
 import { Layout } from '@/components/Layout';
@@ -6,12 +6,17 @@ import { Carousel } from '@/components/Carousel';
 import { TipCard } from '@/components/TipCard';
 import { NotesSummaryCard } from '@/components/NotesSummaryCard';
 import { UpcomingAppointmentCard } from '@/components/UpcomingAppointmentCard';
-import { HospitalsMap } from '@/components/HospitalsMap';
-import { AddAppointmentModal } from '@/components/AddAppointmentModal';
 import { Button } from '@/components/Button';
 import { getPregnancyTips, PregnancyTip } from '@/services/pregnancyTips';
 import { appointmentService, Appointment } from '@/services/appointmentService';
 import { useAuth } from '@/contexts/AuthContext';
+
+const HospitalsMap = lazy(() =>
+  import('@/components/HospitalsMap').then((m) => ({ default: m.HospitalsMap }))
+);
+const AddAppointmentModal = lazy(() =>
+  import('@/components/AddAppointmentModal').then((m) => ({ default: m.AddAppointmentModal }))
+);
 
 const HomeContainer = styled.div`
   max-width: 100rem; /* 1200px baseado em 12px */
@@ -199,7 +204,7 @@ export const Home: React.FC = () => {
             Informações importantes para uma gestação saudável e tranquila
           </SectionSubtitle>
 
-          {loading && <LoadingContainer>Carregando dicas...</LoadingContainer>}
+          {loading && <LoadingContainer>Carregando dicas…</LoadingContainer>}
 
           {error && <ErrorMessage>{error}</ErrorMessage>}
 
@@ -275,15 +280,21 @@ export const Home: React.FC = () => {
           <SectionSubtitle>
             Encontre hospitais e maternidades próximos à sua localização
           </SectionSubtitle>
-          <HospitalsMap />
+            <Suspense fallback={<LoadingContainer>Carregando mapa…</LoadingContainer>}>
+            <HospitalsMap />
+          </Suspense>
         </HospitalsSection>
       </HomeContainer>
 
-      <AddAppointmentModal
-        isOpen={isAddModalOpen}
-        onClose={() => setIsAddModalOpen(false)}
-        onSuccess={handleAddSuccess}
-      />
+      {isAddModalOpen && (
+        <Suspense fallback={<LoadingContainer>Carregando…</LoadingContainer>}>
+          <AddAppointmentModal
+            isOpen={isAddModalOpen}
+            onClose={() => setIsAddModalOpen(false)}
+            onSuccess={handleAddSuccess}
+          />
+        </Suspense>
+      )}
     </Layout>
   );
 };

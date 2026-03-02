@@ -145,7 +145,7 @@ export const appointmentService = {
           })) as Appointment[];
           
           // Ordenar manualmente por data e depois por horário
-          return appointments.sort((a, b) => {
+          return [...appointments].sort((a: Appointment, b: Appointment) => {
             const dateCompare = a.date.localeCompare(b.date);
             if (dateCompare !== 0) return dateCompare;
             return a.time.localeCompare(b.time);

@@ -22,6 +22,10 @@ export interface AuthError {
   message: string;
 }
 
+const REDIRECT_STARTED_KEY = 'eugestante:redirect:v1';
+
+export { REDIRECT_STARTED_KEY };
+
 const getAuthErrorMessage = (error: any): string => {
   const code = error?.code || '';
   const message = error?.message || 'Erro desconhecido';
@@ -112,9 +116,9 @@ export const authService = {
         logger.debug('Auth Domain:', auth?.app.options.authDomain);
         logger.debug('Provider configurado:', provider.providerId);
         
-        // Salvar timestamp para verificar se o redirect foi iniciado
+        // Salvar timestamp para verificar se o redirect foi iniciado (chave versionada da app)
         try {
-          sessionStorage.setItem('firebase:redirect:started', Date.now().toString());
+          sessionStorage.setItem(REDIRECT_STARTED_KEY, Date.now().toString());
           logger.debug('Timestamp salvo em sessionStorage');
         } catch (e) {
           logger.debug('Erro ao salvar timestamp:', e);
@@ -227,7 +231,7 @@ export const authService = {
         logger.debug('getRedirectResult: URL params:', Array.from(urlParams.entries()));
         logger.debug('getRedirectResult: Hash params:', Array.from(hashParams.entries()));
         
-        // Verificar localStorage/sessionStorage para debug
+        // Verificar localStorage para debug (Firebase usa 'firebase:authUser'; apenas leitura, com try/catch)
         try {
           const authState = localStorage.getItem('firebase:authUser');
           logger.debug('getRedirectResult: localStorage authUser:', authState ? 'existe' : 'não existe');

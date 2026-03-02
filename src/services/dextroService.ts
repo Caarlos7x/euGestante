@@ -125,13 +125,11 @@ export const dextroService = {
       });
 
       // Ordenar por data (descendente) localmente
-      records.sort((a, b) => {
+      return [...records].sort((a: DextroRecord, b: DextroRecord) => {
         const dateA = new Date(a.date).getTime();
         const dateB = new Date(b.date).getTime();
         return dateB - dateA; // Descendente
       });
-
-      return records;
     } catch (error: any) {
       console.error('Erro ao carregar registros de dextro:', error);
       // Retornar array vazio em caso de erro para não quebrar a aplicação

@@ -7,6 +7,7 @@ import { Modal } from '@/components/Modal';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Tooltip } from '@/components/Tooltip';
+import { SavingSpinner } from '@/components/SavingSpinner/SavingSpinner';
 import { useAuth } from '@/contexts/AuthContext';
 import { bloodPressureService } from '@/services/bloodPressureService';
 
@@ -72,23 +73,29 @@ const CardDescription = styled.p`
 
 const TableContainer = styled.div`
   width: 100%;
-  display: flex;
-  justify-content: center;
-  overflow-x: hidden;
-  overflow-y: visible;
+  max-width: 100%;
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
+    margin: 0 -${({ theme }) => theme.spacing.md};
+    padding: 0 ${({ theme }) => theme.spacing.md};
+    width: calc(100% + 2 * ${({ theme }) => theme.spacing.md});
+  }
 `;
 
 const Table = styled.table`
   width: 100%;
-  max-width: 100%;
+  min-width: 18rem;
   border-collapse: separate;
   border-spacing: 0;
   font-size: ${({ theme }) => theme.typography.fontSize.sm};
   table-layout: fixed;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
     font-size: ${({ theme }) => theme.typography.fontSize.xs};
     table-layout: auto;
+    min-width: 16rem;
   }
 `;
 
@@ -101,13 +108,13 @@ const TableHeaderCell = styled.th`
   text-align: center;
   font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
   color: ${({ theme }) => theme.colors.text.primary};
-  border-bottom: 0.083rem solid ${({ theme }) => theme.colors.border.medium}; /* 1px */
+  border-bottom: 0.083rem solid ${({ theme }) => theme.colors.border.medium};
   font-size: ${({ theme }) => theme.typography.fontSize.xs};
   letter-spacing: 0.02em;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+  white-space: nowrap;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
     padding: ${({ theme }) => theme.spacing.sm};
-    font-size: ${({ theme }) => theme.typography.fontSize.xs};
   }
 `;
 
@@ -145,15 +152,15 @@ const PressureInputWrapper = styled.div`
   
   input {
     width: 100%;
-    height: 3rem; /* 36px - mesma altura do botão sm */
+    height: 3rem;
     padding: ${({ theme }) => theme.spacing.xs} ${({ theme }) => theme.spacing.sm};
     font-size: ${({ theme }) => theme.typography.fontSize.sm};
     font-family: ${({ theme }) => theme.typography.fontFamily.primary};
     color: ${({ theme }) => theme.colors.text.primary};
     background-color: ${({ theme }) => theme.colors.background.paper};
-    border: 0.083rem solid ${({ theme }) => theme.colors.border.medium}; /* 1px */
+    border: 0.083rem solid ${({ theme }) => theme.colors.border.medium};
     border-radius: ${({ theme }) => theme.borderRadius.md};
-    transition: all ${({ theme }) => theme.transitions.normal};
+    transition: border-color 0.2s ease, box-shadow 0.2s ease;
     text-align: center;
     box-shadow: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
     -webkit-font-smoothing: antialiased;
@@ -244,11 +251,71 @@ const EmptyState = styled.div`
   color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
+const TableAddRow = styled(TableRow)`
+  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
+    display: none;
+  }
+`;
+
+const MobileAddSection = styled.div`
+  display: none;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
+    display: block;
+    margin-top: ${({ theme }) => theme.spacing.xl};
+    padding-top: ${({ theme }) => theme.spacing.lg};
+    border-top: 0.083rem solid ${({ theme }) => theme.colors.border.medium};
+  }
+`;
+
+const MobileAddTitle = styled.h4`
+  font-size: ${({ theme }) => theme.typography.fontSize.lg};
+  font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
+  color: ${({ theme }) => theme.colors.text.primary};
+  margin: 0 0 ${({ theme }) => theme.spacing.md} 0;
+`;
+
+const MobileAddGrid = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.md};
+`;
+
+const MobileField = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.xs};
+
+  label {
+    font-size: ${({ theme }) => theme.typography.fontSize.sm};
+    font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
+    color: ${({ theme }) => theme.colors.text.primary};
+  }
+
+  input {
+    width: 100%;
+    min-height: 2.75rem;
+    padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
+    font-size: ${({ theme }) => theme.typography.fontSize.base};
+    font-family: ${({ theme }) => theme.typography.fontFamily.primary};
+    border: 0.083rem solid ${({ theme }) => theme.colors.border.medium};
+    border-radius: ${({ theme }) => theme.borderRadius.md};
+    box-sizing: border-box;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.colors.primary.main};
+    box-shadow: 0 0 0 0.2rem ${({ theme }) => `${theme.colors.primary.main}40`};
+  }
+`;
+
 export const BloodPressureControlCard: React.FC = () => {
   const { user } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [records, setRecords] = useState<LocalBloodPressureRecord[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
@@ -315,6 +382,7 @@ export const BloodPressureControlCard: React.FC = () => {
     if (!newRecord.date || !user) return;
 
     try {
+      setIsSaving(true);
       setError(null);
       const recordId = await bloodPressureService.saveRecord(user.uid, {
         date: newRecord.date,
@@ -328,7 +396,7 @@ export const BloodPressureControlCard: React.FC = () => {
         pressure: newRecord.pressure || '',
       };
 
-      setRecords([...records, newLocalRecord]);
+      setRecords((prev) => [...prev, newLocalRecord]);
       setNewRecord({
         date: new Date().toISOString().split('T')[0],
         pressure: '',
@@ -336,6 +404,8 @@ export const BloodPressureControlCard: React.FC = () => {
     } catch (err: any) {
       console.error('Erro ao salvar registro:', err);
       setError(err.message || 'Erro ao salvar registro');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -351,6 +421,7 @@ export const BloodPressureControlCard: React.FC = () => {
     if (!editingId || !newRecord.date || !user) return;
 
     try {
+      setIsSaving(true);
       setError(null);
       await bloodPressureService.updateRecord(editingId, {
         date: newRecord.date,
@@ -358,8 +429,8 @@ export const BloodPressureControlCard: React.FC = () => {
       });
 
       // Atualizar estado local
-      setRecords(
-        records.map((r) =>
+      setRecords((prev) =>
+        prev.map((r) =>
           r.id === editingId
             ? {
                 ...r,
@@ -377,6 +448,8 @@ export const BloodPressureControlCard: React.FC = () => {
     } catch (err: any) {
       console.error('Erro ao atualizar registro:', err);
       setError(err.message || 'Erro ao atualizar registro');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -387,7 +460,7 @@ export const BloodPressureControlCard: React.FC = () => {
       setError(null);
       await bloodPressureService.deleteRecord(id);
       // Remover do estado local
-      setRecords(records.filter((r) => r.id !== id));
+      setRecords((prev) => prev.filter((r) => r.id !== id));
     } catch (err: any) {
       console.error('Erro ao deletar registro:', err);
       setError(err.message || 'Erro ao deletar registro');
@@ -494,13 +567,18 @@ export const BloodPressureControlCard: React.FC = () => {
             variant="outline"
             size="sm"
             onClick={handleExportToExcel}
-            disabled={records.length === 0 || loading}
+            disabled={records.length === 0 || loading || isSaving}
           >
             <FaDownload style={{ marginRight: '0.5rem' }} />
             Baixar Excel
           </Button>
         }
       >
+        <SavingSpinner
+          isSaving={isSaving}
+          longWaitMessage="Salvando dados, aguarde mais um momento."
+          longWaitDelayMs={2500}
+        />
         <TableContainer>
           <Table>
             <TableHeader>
@@ -514,7 +592,7 @@ export const BloodPressureControlCard: React.FC = () => {
               {loading ? (
                 <tr>
                   <TableCell colSpan={3}>
-                    <EmptyState>Carregando registros...</EmptyState>
+                    <EmptyState>Carregando registros…</EmptyState>
                   </TableCell>
                 </tr>
               ) : error ? (
@@ -566,7 +644,7 @@ export const BloodPressureControlCard: React.FC = () => {
                   </TableRow>
                 ))
               )}
-              <TableRow style={{ backgroundColor: 'rgba(139, 74, 156, 0.04)' }}>
+              <TableAddRow style={{ backgroundColor: 'rgba(139, 74, 156, 0.04)' }}>
                 <TableCell>
                   <DateInputWrapper>
                     <Input
@@ -601,6 +679,7 @@ export const BloodPressureControlCard: React.FC = () => {
                       variant="primary"
                       size="sm"
                       onClick={handleUpdateRecord}
+                      disabled={isSaving}
                     >
                       Salvar
                     </Button>
@@ -609,15 +688,69 @@ export const BloodPressureControlCard: React.FC = () => {
                       variant="primary"
                       size="sm"
                       onClick={handleAddRecord}
+                      disabled={isSaving}
                     >
                       Adicionar
                     </Button>
                   )}
                 </TableCell>
-              </TableRow>
+              </TableAddRow>
             </TableBody>
           </Table>
         </TableContainer>
+
+        <MobileAddSection>
+          <MobileAddTitle>Novo registro</MobileAddTitle>
+          <MobileAddGrid>
+            <MobileField>
+              <label htmlFor="mobile-bp-date">Data</label>
+              <Input
+                id="mobile-bp-date"
+                type="date"
+                value={newRecord.date || ''}
+                onChange={(value) =>
+                  setNewRecord({ ...newRecord, date: value })
+                }
+                fullWidth
+              />
+            </MobileField>
+            <MobileField>
+              <label htmlFor="mobile-bp-pressure">Pressão (ex.: 120/80)</label>
+              <Tooltip
+                show={showTooltip}
+                message="Apenas números e barra (/) são permitidos. Exemplo: 120/80"
+                position="top"
+              >
+                <input
+                  id="mobile-bp-pressure"
+                  type="text"
+                  placeholder="120/80"
+                  value={newRecord.pressure || ''}
+                  onChange={(e) => handlePressureChange(e.target.value)}
+                />
+              </Tooltip>
+            </MobileField>
+            {editingId ? (
+              <Button
+                variant="primary"
+                fullWidth
+                onClick={handleUpdateRecord}
+                disabled={isSaving}
+              >
+                Salvar alterações
+              </Button>
+            ) : (
+              <Button
+                variant="primary"
+                fullWidth
+                onClick={handleAddRecord}
+                disabled={isSaving}
+              >
+                Adicionar registro
+              </Button>
+            )}
+          </MobileAddGrid>
+        </MobileAddSection>
       </Modal>
     </>
   );

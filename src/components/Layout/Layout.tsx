@@ -9,18 +9,24 @@ interface LayoutProps {
 
 const LayoutContainer = styled.div`
   min-height: 100vh;
+  min-height: 100dvh; /* Dynamic viewport: evita barra do browser no mobile */
   display: flex;
   flex-direction: column;
 `;
 
 const MainContent = styled.main`
   flex: 1;
-  margin-top: 6rem; /* Altura do header fixo - 72px baseado em 12px */
+  margin-top: 6rem; /* Altura do header fixo */
   padding: ${({ theme }) => theme.spacing.lg};
   background-color: ${({ theme }) => theme.colors.background.default};
 
+  /* Mobile-first: padding adequado em telas pequenas */
   @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    padding: ${({ theme }) => theme.spacing.lg}; /* Manter padding maior em mobile */
+    padding: ${({ theme }) => theme.spacing.md};
+  }
+
+  @media (min-width: ${({ theme }) => theme.breakpoints.md}) {
+    padding: ${({ theme }) => theme.spacing.lg};
   }
 `;
 

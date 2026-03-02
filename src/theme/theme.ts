@@ -1,69 +1,75 @@
 export const theme = {
   colors: {
     primary: {
-      main: '#8B4A9C',
-      light: '#B57BC5',
-      dark: '#6B3578',
+      main: '#0891B2',   // Design system: Primary (calm cyan)
+      light: '#22D3EE',
+      dark: '#0e7490',
       contrast: '#FFFFFF',
     },
     secondary: {
-      main: '#FF6B9D',
-      light: '#FF9FC4',
-      dark: '#E6396B',
+      main: '#22D3EE',   // Design system: Secondary (light cyan)
+      light: '#A5F3FC',
+      dark: '#0891B2',
+      contrast: '#164E63',
+    },
+    cta: {
+      main: '#059669',   // Design system: CTA (health green)
+      light: '#34d399',
+      dark: '#047857',
       contrast: '#FFFFFF',
     },
     background: {
-      default: '#F8F9FA',
+      default: '#ECFEFF', // Design system: Background
       paper: '#FFFFFF',
-      light: '#FAFBFC',
+      light: '#CFFAFE',
     },
     text: {
-      primary: '#1A1A1A',
-      secondary: '#6C757D',
-      disabled: '#ADB5BD',
-      hint: '#868E96',
+      primary: '#164E63',   // Design system: Text
+      secondary: '#0e7490',
+      disabled: '#94a3b8',
+      hint: '#64748b',
     },
     error: {
-      main: '#DC3545',
-      light: '#F8D7DA',
-      dark: '#C82333',
+      main: '#dc2626',
+      light: '#fef2f2',
+      dark: '#b91c1c',
     },
     success: {
-      main: '#28A745',
-      light: '#D4EDDA',
-      dark: '#1E7E34',
+      main: '#059669',   // Alinhado ao CTA
+      light: '#d1fae5',
+      dark: '#047857',
     },
     warning: {
-      main: '#FFC107',
-      light: '#FFF3CD',
-      dark: '#E0A800',
+      main: '#d97706',
+      light: '#fffbeb',
+      dark: '#b45309',
     },
     info: {
-      main: '#17A2B8',
-      light: '#D1ECF1',
-      dark: '#138496',
+      main: '#0891B2',
+      light: '#CFFAFE',
+      dark: '#0e7490',
     },
     border: {
-      light: '#E9ECEF',
-      medium: '#DEE2E6',
-      dark: '#CED4DA',
+      light: '#A5F3FC',
+      medium: '#22D3EE',
+      dark: '#0891B2',
     },
   },
   typography: {
     fontFamily: {
-      primary: "'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen', 'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue', sans-serif",
-      secondary: "'Poppins', sans-serif",
+      primary: "'Raleway', 'Segoe UI', Tahoma, sans-serif",   // Body - Design system
+      secondary: "'Lora', 'Georgia', serif",                 // Heading - Design system
     },
     fontSize: {
-      xs: '0.75rem',    // 9px (base 12px)
-      sm: '0.875rem',   // 10.5px (base 12px)
-      base: '1rem',     // 12px (base 12px)
-      lg: '1.125rem',   // 13.5px (base 12px)
-      xl: '1.25rem',    // 15px (base 12px)
-      '2xl': '1.5rem',  // 18px (base 12px)
-      '3xl': '1.875rem', // 22.5px (base 12px)
-      '4xl': '2.25rem',  // 27px (base 12px)
-      '5xl': '3rem',     // 36px (base 12px)
+      xs: '0.875rem',   // 14px - Design system: large text 16px+; mínimo legível
+      sm: '0.9375rem',  // 15px
+      base: '1rem',     // 16px - Design system: minimum 16px body
+      lg: '1.125rem',
+      xl: '1.25rem',
+      '2xl': '1.5rem',
+      '3xl': '1.875rem',
+      '4xl': '2.25rem',
+      '5xl': '3rem',
     },
     fontWeight: {
       light: 300,

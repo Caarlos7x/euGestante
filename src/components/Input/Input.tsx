@@ -12,6 +12,8 @@ interface InputProps {
   disabled?: boolean;
   fullWidth?: boolean;
   autoComplete?: string;
+  name?: string;
+  id?: string;
 }
 
 const InputContainer = styled.div<{ $fullWidth?: boolean }>`
@@ -44,16 +46,16 @@ const StyledInput = styled.input<{ $hasError: boolean }>`
     ${({ theme, $hasError }) =>
       $hasError ? theme.colors.error.main : theme.colors.border.medium};
   border-radius: ${({ theme }) => theme.borderRadius.lg};
-  transition: all ${({ theme }) => theme.transitions.normal};
+  transition: border-color 0.25s ease-in-out, box-shadow 0.25s ease-in-out;
   cursor: text;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
   text-rendering: optimizeLegibility;
 
   @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    padding: ${({ theme }) => theme.spacing.lg}; /* Aumentar padding em mobile */
-    font-size: ${({ theme }) => theme.typography.fontSize.base}; /* Manter legível */
-    min-height: 3.5rem; /* 42px - melhor para toque */
+    padding: ${({ theme }) => theme.spacing.lg};
+    font-size: ${({ theme }) => theme.typography.fontSize.base};
+    min-height: 2.75rem; /* 44px touch target (responsive-design) */
   }
 
   &::placeholder {
@@ -84,7 +86,9 @@ const PasswordToggle = styled.button`
   border: none;
   color: ${({ theme }) => theme.colors.text.secondary};
   cursor: pointer;
-  padding: ${({ theme }) => theme.spacing.xs};
+  padding: ${({ theme }) => theme.spacing.sm};
+  min-width: 2.75rem;
+  min-height: 2.75rem;
   font-size: ${({ theme }) => theme.typography.fontSize.sm};
   transition: color ${({ theme }) => theme.transitions.fast};
 
@@ -110,22 +114,27 @@ export const Input: React.FC<InputProps> = ({
   disabled = false,
   fullWidth = true,
   autoComplete,
+  name,
+  id: idProp,
 }) => {
   const [showPassword, setShowPassword] = useState(false);
   const isPassword = type === 'password';
 
   const inputType = isPassword && showPassword ? 'text' : type;
+  const inputId = idProp || (label ? `input-${label.replace(/\s+/g, '-').toLowerCase()}` : undefined);
 
   return (
     <InputContainer $fullWidth={fullWidth}>
       {label && (
-        <Label>
+        <Label htmlFor={inputId}>
           {label}
           {required && <span style={{ color: '#DC3545' }}> *</span>}
         </Label>
       )}
       <InputWrapper>
         <StyledInput
+          id={inputId}
+          name={name}
           type={inputType}
           placeholder={placeholder}
           value={value}

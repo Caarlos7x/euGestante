@@ -63,7 +63,8 @@ const TypeButton = styled.button<{ $active: boolean; $type: 'exame' | 'consulta'
   font-weight: ${({ theme, $active }) =>
     $active ? theme.typography.fontWeight.semibold : theme.typography.fontWeight.regular};
   cursor: pointer;
-  transition: all ${({ theme }) => theme.transitions.normal};
+  transition: border-color 0.25s ease-in-out, background-color 0.25s ease-in-out,
+    color 0.25s ease-in-out;
   font-size: ${({ theme }) => theme.typography.fontSize.base};
 
   @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {

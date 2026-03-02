@@ -105,10 +105,12 @@ const ArrowButton = styled.button<{ $direction: 'left' | 'right' }>`
   ${({ $direction }) => ($direction === 'left' ? 'left: 1rem' : 'right: 1rem')};
   transform: translateY(-50%);
   background-color: ${({ theme }) => theme.colors.background.paper};
-  border: 0.083rem solid ${({ theme }) => theme.colors.border.medium}; /* 1px */
+  border: 0.083rem solid ${({ theme }) => theme.colors.border.medium};
   border-radius: 50%;
-  width: 3rem; /* 36px */
-  height: 3rem; /* 36px */
+  width: 2.75rem; /* 44px touch target */
+  height: 2.75rem;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
   display: flex;
   align-items: center;
   justify-content: center;
@@ -131,7 +133,7 @@ const ArrowButton = styled.button<{ $direction: 'left' | 'right' }>`
   }
 
   @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    display: none; /* Esconder setas em mobile */
+    display: none;
   }
 `;
 
@@ -145,8 +147,8 @@ const DotsContainer = styled.div`
 `;
 
 const Dot = styled.button<{ $active: boolean }>`
-  width: 0.75rem; /* 9px */
-  height: 0.75rem; /* 9px */
+  width: 0.75rem;
+  height: 0.75rem;
   border-radius: 50%;
   border: none;
   background-color: ${({ theme, $active }) =>
@@ -155,15 +157,19 @@ const Dot = styled.button<{ $active: boolean }>`
   transition: all ${({ theme }) => theme.transitions.normal};
   padding: 0;
 
+  /* Touch target 44x44px em mobile (responsive-design) */
+  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
+    width: 0.75rem;
+    height: 0.75rem;
+    min-width: 2.75rem;
+    min-height: 2.75rem;
+    padding: 1rem;
+  }
+
   &:hover {
     background-color: ${({ theme, $active }) =>
       $active ? theme.colors.primary.dark : theme.colors.border.dark};
     transform: scale(1.2);
-  }
-
-  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
-    width: 1rem; /* 12px - aumentar para melhor toque */
-    height: 1rem; /* 12px */
   }
 `;
 

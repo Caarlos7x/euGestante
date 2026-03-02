@@ -7,6 +7,7 @@ import { Modal } from '@/components/Modal';
 import { Button } from '@/components/Button';
 import { Input } from '@/components/Input';
 import { Tooltip } from '@/components/Tooltip';
+import { SavingSpinner } from '@/components/SavingSpinner/SavingSpinner';
 import { useAuth } from '@/contexts/AuthContext';
 import { dextroService } from '@/services/dextroService';
 
@@ -77,23 +78,31 @@ const CardDescription = styled.p`
 
 const TableContainer = styled.div`
   width: 100%;
-  display: flex;
-  justify-content: center;
-  overflow-x: hidden;
+  max-width: 100%;
+  overflow-x: auto;
   overflow-y: visible;
+  -webkit-overflow-scrolling: touch;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
+    margin: 0 -${({ theme }) => theme.spacing.md};
+    padding: 0 ${({ theme }) => theme.spacing.md};
+    width: calc(100% + 2 * ${({ theme }) => theme.spacing.md});
+    max-width: none;
+  }
 `;
 
 const Table = styled.table`
   width: 100%;
-  max-width: 100%;
+  min-width: 32rem;
   border-collapse: separate;
   border-spacing: 0;
   font-size: ${({ theme }) => theme.typography.fontSize.sm};
   table-layout: fixed;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
     font-size: ${({ theme }) => theme.typography.fontSize.xs};
     table-layout: auto;
+    min-width: 28rem;
   }
 `;
 
@@ -106,13 +115,14 @@ const TableHeaderCell = styled.th`
   text-align: center;
   font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
   color: ${({ theme }) => theme.colors.text.primary};
-  border-bottom: 0.083rem solid ${({ theme }) => theme.colors.border.medium}; /* 1px */
+  border-bottom: 0.083rem solid ${({ theme }) => theme.colors.border.medium};
   font-size: ${({ theme }) => theme.typography.fontSize.xs};
   letter-spacing: 0.02em;
-  
-  @media (max-width: ${({ theme }) => theme.breakpoints.md}) {
-    padding: ${({ theme }) => theme.spacing.sm};
-    font-size: ${({ theme }) => theme.typography.fontSize.xs};
+  white-space: nowrap;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
+    padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.xs};
+    font-size: 0.7rem;
   }
 `;
 
@@ -259,11 +269,71 @@ const EmptyState = styled.div`
   color: ${({ theme }) => theme.colors.text.secondary};
 `;
 
+const MobileAddSection = styled.div`
+  display: none;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
+    display: block;
+    margin-top: ${({ theme }) => theme.spacing.xl};
+    padding-top: ${({ theme }) => theme.spacing.lg};
+    border-top: 0.083rem solid ${({ theme }) => theme.colors.border.medium};
+  }
+`;
+
+const MobileAddTitle = styled.h4`
+  font-size: ${({ theme }) => theme.typography.fontSize.lg};
+  font-weight: ${({ theme }) => theme.typography.fontWeight.semibold};
+  color: ${({ theme }) => theme.colors.text.primary};
+  margin: 0 0 ${({ theme }) => theme.spacing.md} 0;
+`;
+
+const MobileAddGrid = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.md};
+`;
+
+const MobileField = styled.div`
+  display: flex;
+  flex-direction: column;
+  gap: ${({ theme }) => theme.spacing.xs};
+
+  label {
+    font-size: ${({ theme }) => theme.typography.fontSize.sm};
+    font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
+    color: ${({ theme }) => theme.colors.text.primary};
+  }
+
+  input {
+    width: 100%;
+    min-height: 2.75rem;
+    padding: ${({ theme }) => theme.spacing.sm} ${({ theme }) => theme.spacing.md};
+    font-size: ${({ theme }) => theme.typography.fontSize.base};
+    font-family: ${({ theme }) => theme.typography.fontFamily.primary};
+    border: 0.083rem solid ${({ theme }) => theme.colors.border.medium};
+    border-radius: ${({ theme }) => theme.borderRadius.md};
+    box-sizing: border-box;
+  }
+
+  input:focus {
+    outline: none;
+    border-color: ${({ theme }) => theme.colors.primary.main};
+    box-shadow: 0 0 0 0.2rem ${({ theme }) => `${theme.colors.primary.main}40`};
+  }
+`;
+
+const TableAddRow = styled(TableRow)`
+  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
+    display: none;
+  }
+`;
+
 export const DextroControlCard: React.FC = () => {
   const { user } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
   const [records, setRecords] = useState<LocalDextroRecord[]>([]);
   const [loading, setLoading] = useState(false);
+  const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [editingId, setEditingId] = useState<string | null>(null);
   const [showTooltip, setShowTooltip] = useState(false);
@@ -337,6 +407,7 @@ export const DextroControlCard: React.FC = () => {
     if (!newRecord.date || !user) return;
 
     try {
+      setIsSaving(true);
       setError(null);
       const recordId = await dextroService.saveRecord(user.uid, {
         date: newRecord.date,
@@ -360,7 +431,7 @@ export const DextroControlCard: React.FC = () => {
         umaHoraPosJantar: newRecord.umaHoraPosJantar || '',
       };
 
-      setRecords([...records, newLocalRecord]);
+      setRecords((prev) => [...prev, newLocalRecord]);
       setNewRecord({
         date: new Date().toISOString().split('T')[0],
         jejum: '',
@@ -373,6 +444,8 @@ export const DextroControlCard: React.FC = () => {
     } catch (err: any) {
       console.error('Erro ao salvar registro:', err);
       setError(err.message || 'Erro ao salvar registro');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -388,6 +461,7 @@ export const DextroControlCard: React.FC = () => {
     if (!editingId || !newRecord.date || !user) return;
 
     try {
+      setIsSaving(true);
       setError(null);
       await dextroService.updateRecord(editingId, {
         date: newRecord.date,
@@ -400,8 +474,8 @@ export const DextroControlCard: React.FC = () => {
       });
 
       // Atualizar estado local
-      setRecords(
-        records.map((r) =>
+      setRecords((prev) =>
+        prev.map((r) =>
           r.id === editingId
             ? {
                 ...r,
@@ -429,6 +503,8 @@ export const DextroControlCard: React.FC = () => {
     } catch (err: any) {
       console.error('Erro ao atualizar registro:', err);
       setError(err.message || 'Erro ao atualizar registro');
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -439,7 +515,7 @@ export const DextroControlCard: React.FC = () => {
       setError(null);
       await dextroService.deleteRecord(id);
       // Remover do estado local
-      setRecords(records.filter((r) => r.id !== id));
+      setRecords((prev) => prev.filter((r) => r.id !== id));
     } catch (err: any) {
       console.error('Erro ao deletar registro:', err);
       setError(err.message || 'Erro ao deletar registro');
@@ -570,13 +646,18 @@ export const DextroControlCard: React.FC = () => {
             variant="outline"
             size="sm"
             onClick={handleExportToExcel}
-            disabled={records.length === 0 || loading}
+            disabled={records.length === 0 || loading || isSaving}
           >
             <FaDownload style={{ marginRight: '0.5rem' }} />
             Baixar Excel
           </Button>
         }
       >
+        <SavingSpinner
+          isSaving={isSaving}
+          longWaitMessage="Salvando dados, aguarde mais um momento."
+          longWaitDelayMs={2500}
+        />
         <TableContainer>
           <Table>
             <TableHeader>
@@ -595,7 +676,7 @@ export const DextroControlCard: React.FC = () => {
               {loading ? (
                 <tr>
                   <TableCell colSpan={8}>
-                    <EmptyState>Carregando registros...</EmptyState>
+                    <EmptyState>Carregando registros…</EmptyState>
                   </TableCell>
                 </tr>
               ) : error ? (
@@ -652,7 +733,7 @@ export const DextroControlCard: React.FC = () => {
                   </TableRow>
                 ))
               )}
-              <TableRow style={{ backgroundColor: 'rgba(139, 74, 156, 0.04)' }}>
+              <TableAddRow style={{ backgroundColor: 'rgba(139, 74, 156, 0.04)' }}>
                 <TableCell>
                   <DateInputWrapper>
                     <Input
@@ -789,6 +870,7 @@ export const DextroControlCard: React.FC = () => {
                       variant="primary"
                       size="sm"
                       onClick={handleUpdateRecord}
+                      disabled={isSaving}
                     >
                       Salvar
                     </Button>
@@ -797,15 +879,107 @@ export const DextroControlCard: React.FC = () => {
                       variant="primary"
                       size="sm"
                       onClick={handleAddRecord}
+                      disabled={isSaving}
                     >
                       Adicionar
                     </Button>
                   )}
                 </TableCell>
-              </TableRow>
+              </TableAddRow>
             </TableBody>
           </Table>
         </TableContainer>
+
+        <MobileAddSection>
+          <MobileAddTitle>Novo registro</MobileAddTitle>
+          <MobileAddGrid>
+            <MobileField>
+              <label htmlFor="mobile-dextro-date">Data</label>
+              <Input
+                id="mobile-dextro-date"
+                type="date"
+                value={newRecord.date || ''}
+                onChange={(value) => setNewRecord({ ...newRecord, date: value })}
+                fullWidth
+              />
+            </MobileField>
+            <MobileField>
+              <label htmlFor="mobile-dextro-jejum">Jejum (mg/dL)</label>
+              <input
+                id="mobile-dextro-jejum"
+                type="text"
+                inputMode="numeric"
+                placeholder="mg/dL"
+                value={newRecord.jejum || ''}
+                onChange={(e) => handleNumericChange(e.target.value, 'jejum')}
+              />
+            </MobileField>
+            <MobileField>
+              <label htmlFor="mobile-dextro-1h-alm">1h pós almoço</label>
+              <input
+                id="mobile-dextro-1h-alm"
+                type="text"
+                inputMode="numeric"
+                placeholder="mg/dL"
+                value={newRecord.umaHoraPosAlmoco || ''}
+                onChange={(e) => handleNumericChange(e.target.value, 'umaHoraPosAlmoco')}
+              />
+            </MobileField>
+            <MobileField>
+              <label htmlFor="mobile-dextro-pre-alm">Pré almoço</label>
+              <input
+                id="mobile-dextro-pre-alm"
+                type="text"
+                inputMode="numeric"
+                placeholder="mg/dL"
+                value={newRecord.preAlmoco || ''}
+                onChange={(e) => handleNumericChange(e.target.value, 'preAlmoco')}
+              />
+            </MobileField>
+            <MobileField>
+              <label htmlFor="mobile-dextro-1h-alm2">1h pós almoço 2</label>
+              <input
+                id="mobile-dextro-1h-alm2"
+                type="text"
+                inputMode="numeric"
+                placeholder="mg/dL"
+                value={newRecord.umaHoraPosAlmoco2 || ''}
+                onChange={(e) => handleNumericChange(e.target.value, 'umaHoraPosAlmoco2')}
+              />
+            </MobileField>
+            <MobileField>
+              <label htmlFor="mobile-dextro-pre-jantar">Pré jantar</label>
+              <input
+                id="mobile-dextro-pre-jantar"
+                type="text"
+                inputMode="numeric"
+                placeholder="mg/dL"
+                value={newRecord.preJantar || ''}
+                onChange={(e) => handleNumericChange(e.target.value, 'preJantar')}
+              />
+            </MobileField>
+            <MobileField>
+              <label htmlFor="mobile-dextro-1h-jantar">1h pós jantar</label>
+              <input
+                id="mobile-dextro-1h-jantar"
+                type="text"
+                inputMode="numeric"
+                placeholder="mg/dL"
+                value={newRecord.umaHoraPosJantar || ''}
+                onChange={(e) => handleNumericChange(e.target.value, 'umaHoraPosJantar')}
+              />
+            </MobileField>
+            {editingId ? (
+              <Button variant="primary" fullWidth onClick={handleUpdateRecord} disabled={isSaving}>
+                Salvar alterações
+              </Button>
+            ) : (
+              <Button variant="primary" fullWidth onClick={handleAddRecord} disabled={isSaving}>
+                Adicionar registro
+              </Button>
+            )}
+          </MobileAddGrid>
+        </MobileAddSection>
       </Modal>
     </>
   );

@@ -120,13 +120,11 @@ export const bloodPressureService = {
       });
 
       // Ordenar por data (descendente) localmente
-      records.sort((a, b) => {
+      return [...records].sort((a: BloodPressureRecord, b: BloodPressureRecord) => {
         const dateA = new Date(a.date).getTime();
         const dateB = new Date(b.date).getTime();
         return dateB - dateA; // Descendente
       });
-
-      return records;
     } catch (error: any) {
       console.error('Erro ao carregar registros de pressão arterial:', error);
       return [];

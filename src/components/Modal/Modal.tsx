@@ -54,6 +54,7 @@ const ModalContainer = styled.div<{ $size?: 'sm' | 'md' | 'lg' | 'xl' }>`
     }
   }};
   max-height: 90vh;
+  max-height: 90dvh; /* Dynamic viewport no mobile (responsive-design) */
   display: flex;
   flex-direction: column;
   animation: slideUp 0.3s ease-out;
@@ -71,7 +72,10 @@ const ModalContainer = styled.div<{ $size?: 'sm' | 'md' | 'lg' | 'xl' }>`
 
   @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
     max-width: 100%;
+    width: 100%;
+    height: 100%;
     max-height: 100vh;
+    max-height: 100dvh;
     border-radius: ${({ theme }) => theme.borderRadius.lg} ${({ theme }) => theme.borderRadius.lg} 0 0;
   }
 `;
@@ -80,8 +84,15 @@ const ModalHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
+  flex-wrap: wrap;
+  gap: ${({ theme }) => theme.spacing.sm};
   padding: ${({ theme }) => theme.spacing.lg};
-  border-bottom: 0.083rem solid ${({ theme }) => theme.colors.border.medium}; /* 1px */
+  border-bottom: 0.083rem solid ${({ theme }) => theme.colors.border.medium};
+  flex-shrink: 0;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
+    padding: ${({ theme }) => theme.spacing.md};
+  }
 `;
 
 const ModalTitle = styled.h2`
@@ -101,14 +112,14 @@ const CloseButton = styled.button`
   font-size: ${({ theme }) => theme.typography.fontSize['2xl']};
   color: ${({ theme }) => theme.colors.text.secondary};
   cursor: pointer;
-  padding: ${({ theme }) => theme.spacing.xs};
+  padding: ${({ theme }) => theme.spacing.sm};
+  min-width: 2.75rem;
+  min-height: 2.75rem;
   line-height: 1;
   transition: color ${({ theme }) => theme.transitions.fast};
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 2rem; /* 24px */
-  height: 2rem; /* 24px */
   border-radius: ${({ theme }) => theme.borderRadius.md};
 
   &:hover {
@@ -121,10 +132,17 @@ const ModalBody = styled.div`
   padding: ${({ theme }) => theme.spacing.lg};
   overflow-y: auto;
   overflow-x: hidden;
+  overscroll-behavior: contain;
   flex: 1;
+  min-height: 0;
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: stretch;
+  width: 100%;
+
+  @media (max-width: ${({ theme }) => theme.breakpoints.sm}) {
+    padding: ${({ theme }) => theme.spacing.md};
+  }
 `;
 
 const ModalFooter = styled.div`

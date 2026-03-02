@@ -347,13 +347,13 @@ export const MedicationCard: React.FC = () => {
 
   const handleAddTime = () => {
     if (newMedicationTime && !newMedicationTimes.includes(newMedicationTime)) {
-      setNewMedicationTimes([...newMedicationTimes, newMedicationTime].sort());
+      setNewMedicationTimes((prev) => [...prev, newMedicationTime].sort());
       setNewMedicationTime('');
     }
   };
 
   const handleRemoveTime = (time: string) => {
-    setNewMedicationTimes(newMedicationTimes.filter((t) => t !== time));
+    setNewMedicationTimes((prev) => prev.filter((t) => t !== time));
   };
 
   const handleSaveMedication = async () => {

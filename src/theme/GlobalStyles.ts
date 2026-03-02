@@ -8,8 +8,8 @@ export const GlobalStyles = createGlobalStyle`
   }
 
   html {
-    /* Base: 12px (75% de 16px padrão do navegador) */
-    font-size: 0.75rem; /* 12px baseado em 16px padrão */
+    /* Design system: large text 16px+ — base 100% (16px) */
+    font-size: 1rem;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -30,11 +30,13 @@ export const GlobalStyles = createGlobalStyle`
 
   #root {
     min-height: 100vh;
+    min-height: 100dvh; /* Dynamic viewport no mobile (responsive-design) */
     width: 100%;
   }
 
   /* Typography */
   h1, h2, h3, h4, h5, h6 {
+    font-family: ${({ theme }) => theme.typography.fontFamily.secondary};
     font-weight: ${({ theme }) => theme.typography.fontWeight.bold};
     line-height: ${({ theme }) => theme.typography.lineHeight.tight};
     color: ${({ theme }) => theme.colors.text.primary};
@@ -88,7 +90,12 @@ export const GlobalStyles = createGlobalStyle`
     cursor: pointer;
     border: none;
     outline: none;
-    transition: all ${({ theme }) => theme.transitions.normal};
+    transition: color ${({ theme }) => theme.transitions.normal},
+      background-color ${({ theme }) => theme.transitions.normal},
+      border-color ${({ theme }) => theme.transitions.normal},
+      opacity ${({ theme }) => theme.transitions.normal},
+      transform ${({ theme }) => theme.transitions.normal},
+      box-shadow ${({ theme }) => theme.transitions.normal};
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
@@ -128,10 +135,19 @@ export const GlobalStyles = createGlobalStyle`
     }
   }
 
-  /* Focus styles */
+  /* Focus styles — Design system: 3–4px focus rings */
   *:focus-visible {
-    outline: 0.166rem solid ${({ theme }) => theme.colors.primary.main}; /* 2px baseado em 12px */
-    outline-offset: 0.166rem; /* 2px baseado em 12px */
+    outline: 0.25rem solid ${({ theme }) => theme.colors.primary.main}; /* 4px */
+    outline-offset: 0.1875rem; /* 3px */
+  }
+
+  /* Reduced motion — Design system: prefers-reduced-motion respected */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 
   /* Selection */

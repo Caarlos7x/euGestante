@@ -163,6 +163,7 @@ interface MenuItemProps {
 const MenuItemButton = styled.button`
   width: 100%;
   padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
+  min-height: 2.75rem; /* Touch target 44px (responsive-design) */
   background: none;
   border: none;
   text-align: left;
@@ -191,6 +192,8 @@ const MenuItemLink = styled.a`
   display: block;
   width: 100%;
   padding: ${({ theme }) => theme.spacing.md} ${({ theme }) => theme.spacing.lg};
+  min-height: 2.75rem; /* Touch target 44px */
+  line-height: 1.5;
   text-align: left;
   font-size: ${({ theme }) => theme.typography.fontSize.base};
   font-weight: ${({ theme }) => theme.typography.fontWeight.medium};
