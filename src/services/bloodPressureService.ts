@@ -119,11 +119,9 @@ export const bloodPressureService = {
         } as BloodPressureRecord);
       });
 
-      // Ordenar por data (descendente) localmente
+      // Ordenar por data (descendente) - comparação de string YYYY-MM-DD evita fuso
       return [...records].sort((a: BloodPressureRecord, b: BloodPressureRecord) => {
-        const dateA = new Date(a.date).getTime();
-        const dateB = new Date(b.date).getTime();
-        return dateB - dateA; // Descendente
+        return b.date.localeCompare(a.date);
       });
     } catch (error: any) {
       console.error('Erro ao carregar registros de pressão arterial:', error);

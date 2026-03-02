@@ -310,6 +310,15 @@ const MobileField = styled.div`
   }
 `;
 
+/** Data de hoje no fuso local em YYYY-MM-DD (evita dia errado por UTC) */
+const getTodayLocalDateString = (): string => {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+};
+
 export const BloodPressureControlCard: React.FC = () => {
   const { user } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -321,7 +330,7 @@ export const BloodPressureControlCard: React.FC = () => {
   const [showTooltip, setShowTooltip] = useState(false);
   const tooltipTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [newRecord, setNewRecord] = useState<Partial<LocalBloodPressureRecord>>({
-    date: new Date().toISOString().split('T')[0],
+    date: getTodayLocalDateString(),
     pressure: '',
   });
 
@@ -373,7 +382,7 @@ export const BloodPressureControlCard: React.FC = () => {
     setIsModalOpen(false);
     setEditingId(null);
     setNewRecord({
-      date: new Date().toISOString().split('T')[0],
+      date: getTodayLocalDateString(),
       pressure: '',
     });
   };
@@ -398,7 +407,7 @@ export const BloodPressureControlCard: React.FC = () => {
 
       setRecords((prev) => [...prev, newLocalRecord]);
       setNewRecord({
-        date: new Date().toISOString().split('T')[0],
+        date: getTodayLocalDateString(),
         pressure: '',
       });
     } catch (err: any) {
@@ -442,7 +451,7 @@ export const BloodPressureControlCard: React.FC = () => {
       );
       setEditingId(null);
       setNewRecord({
-        date: new Date().toISOString().split('T')[0],
+        date: getTodayLocalDateString(),
         pressure: '',
       });
     } catch (err: any) {
@@ -468,8 +477,10 @@ export const BloodPressureControlCard: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('pt-BR');
+    if (!dateString) return '';
+    const [y, m, d] = dateString.split('-').map(Number);
+    if (Number.isNaN(y) || Number.isNaN(m) || Number.isNaN(d)) return dateString;
+    return new Date(y, m - 1, d).toLocaleDateString('pt-BR');
   };
 
   const handlePressureChange = (value: string) => {

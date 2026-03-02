@@ -328,6 +328,15 @@ const TableAddRow = styled(TableRow)`
   }
 `;
 
+/** Data de hoje no fuso local em YYYY-MM-DD (evita dia errado por UTC) */
+const getTodayLocalDateString = (): string => {
+  const d = new Date();
+  const y = d.getFullYear();
+  const m = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${y}-${m}-${day}`;
+};
+
 export const DextroControlCard: React.FC = () => {
   const { user } = useAuth();
   const [isModalOpen, setIsModalOpen] = useState(false);
@@ -340,7 +349,7 @@ export const DextroControlCard: React.FC = () => {
   const [tooltipField, setTooltipField] = useState<string | null>(null);
   const tooltipTimeoutRef = useRef<NodeJS.Timeout | null>(null);
   const [newRecord, setNewRecord] = useState<Partial<LocalDextroRecord>>({
-    date: new Date().toISOString().split('T')[0],
+    date: getTodayLocalDateString(),
     jejum: '',
     umaHoraPosAlmoco: '',
     preAlmoco: '',
@@ -393,7 +402,7 @@ export const DextroControlCard: React.FC = () => {
     setIsModalOpen(false);
     setEditingId(null);
     setNewRecord({
-      date: new Date().toISOString().split('T')[0],
+      date: getTodayLocalDateString(),
       jejum: '',
       umaHoraPosAlmoco: '',
       preAlmoco: '',
@@ -404,7 +413,14 @@ export const DextroControlCard: React.FC = () => {
   };
 
   const handleAddRecord = async () => {
-    if (!newRecord.date || !user) return;
+    if (!user) {
+      setError('Faça login para continuar.');
+      return;
+    }
+    if (!newRecord.date) {
+      setError('Informe a data do registro.');
+      return;
+    }
 
     try {
       setIsSaving(true);
@@ -433,7 +449,7 @@ export const DextroControlCard: React.FC = () => {
 
       setRecords((prev) => [...prev, newLocalRecord]);
       setNewRecord({
-        date: new Date().toISOString().split('T')[0],
+        date: getTodayLocalDateString(),
         jejum: '',
         umaHoraPosAlmoco: '',
         preAlmoco: '',
@@ -458,7 +474,14 @@ export const DextroControlCard: React.FC = () => {
   };
 
   const handleUpdateRecord = async () => {
-    if (!editingId || !newRecord.date || !user) return;
+    if (!editingId || !user) {
+      setError('Sessão inválida. Feche e abra o modal novamente.');
+      return;
+    }
+    if (!newRecord.date) {
+      setError('Informe a data do registro.');
+      return;
+    }
 
     try {
       setIsSaving(true);
@@ -492,7 +515,7 @@ export const DextroControlCard: React.FC = () => {
       );
       setEditingId(null);
       setNewRecord({
-        date: new Date().toISOString().split('T')[0],
+        date: getTodayLocalDateString(),
         jejum: '',
         umaHoraPosAlmoco: '',
         preAlmoco: '',
@@ -523,8 +546,10 @@ export const DextroControlCard: React.FC = () => {
   };
 
   const formatDate = (dateString: string) => {
-    const date = new Date(dateString);
-    return date.toLocaleDateString('pt-BR');
+    if (!dateString) return '';
+    const [y, m, d] = dateString.split('-').map(Number);
+    if (Number.isNaN(y) || Number.isNaN(m) || Number.isNaN(d)) return dateString;
+    return new Date(y, m - 1, d).toLocaleDateString('pt-BR');
   };
 
   const handleNumericChange = (
@@ -867,6 +892,7 @@ export const DextroControlCard: React.FC = () => {
                 <TableCell>
                   {editingId ? (
                     <Button
+                      type="button"
                       variant="primary"
                       size="sm"
                       onClick={handleUpdateRecord}
@@ -876,6 +902,7 @@ export const DextroControlCard: React.FC = () => {
                     </Button>
                   ) : (
                     <Button
+                      type="button"
                       variant="primary"
                       size="sm"
                       onClick={handleAddRecord}
@@ -892,7 +919,18 @@ export const DextroControlCard: React.FC = () => {
 
         <MobileAddSection>
           <MobileAddTitle>Novo registro</MobileAddTitle>
-          <MobileAddGrid>
+          <form
+            onSubmit={(e) => {
+              e.preventDefault();
+              if (editingId) {
+                handleUpdateRecord();
+              } else {
+                handleAddRecord();
+              }
+            }}
+            noValidate
+          >
+            <MobileAddGrid>
             <MobileField>
               <label htmlFor="mobile-dextro-date">Data</label>
               <Input
@@ -970,15 +1008,21 @@ export const DextroControlCard: React.FC = () => {
               />
             </MobileField>
             {editingId ? (
-              <Button variant="primary" fullWidth onClick={handleUpdateRecord} disabled={isSaving}>
+              <Button type="submit" variant="primary" fullWidth disabled={isSaving}>
                 Salvar alterações
               </Button>
             ) : (
-              <Button variant="primary" fullWidth onClick={handleAddRecord} disabled={isSaving}>
+              <Button type="submit" variant="primary" fullWidth disabled={isSaving}>
                 Adicionar registro
               </Button>
             )}
+            {error && (
+              <EmptyState style={{ color: '#ef4444', padding: '0.5rem 0', textAlign: 'left' }}>
+                {error}
+              </EmptyState>
+            )}
           </MobileAddGrid>
+          </form>
         </MobileAddSection>
       </Modal>
     </>

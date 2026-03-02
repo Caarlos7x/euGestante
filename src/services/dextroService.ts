@@ -124,11 +124,9 @@ export const dextroService = {
         } as DextroRecord);
       });
 
-      // Ordenar por data (descendente) localmente
+      // Ordenar por data (descendente) - comparação de string YYYY-MM-DD evita fuso
       return [...records].sort((a: DextroRecord, b: DextroRecord) => {
-        const dateA = new Date(a.date).getTime();
-        const dateB = new Date(b.date).getTime();
-        return dateB - dateA; // Descendente
+        return b.date.localeCompare(a.date);
       });
     } catch (error: any) {
       console.error('Erro ao carregar registros de dextro:', error);
